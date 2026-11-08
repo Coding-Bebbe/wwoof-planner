@@ -9,3 +9,9 @@ browser_profile/
 local/
 export/
 logs/
+
+# generated output from runs with test data
+out/
+
+# Excel lock files
+~$*
