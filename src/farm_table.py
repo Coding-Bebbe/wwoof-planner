@@ -42,3 +42,13 @@ def read_farms(path: Path) -> list[dict[str, str]]:
             farms.append(row)
 
     return farms
+
+
+def write_farms(path: Path, farms: list[dict[str, str]]) -> None:
+    """Write farms to a farm table. An existing file is replaced."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    with open(path, "w", encoding=CSV_ENCODING, newline="") as file:
+        writer = csv.DictWriter(file, fieldnames=FARM_COLUMNS, delimiter=CSV_DELIMITER)
+        writer.writeheader()
+        writer.writerows(farms)
