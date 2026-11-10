@@ -2,7 +2,7 @@
 
 Privates Lern- und Planungsprojekt: KI-freie Python-Skripte, die Hofinformationen für eine WWOOF-Reise lokal erfassen und aufbereiten.
 
-**Dieses Repository enthält keine echten Hofdaten.** Echte Daten liegen ausschließlich des Repositorys. Die Testdaten in `tests/fixtures/` sind vollständig erfunden.
+**Dieses Repository enthält keine echten Hofdaten.** Echte Daten liegen außerhalb des Repositorys. Die Testdaten in `tests/fixtures/` sind vollständig erfunden.
 
 ## Ordner
 
