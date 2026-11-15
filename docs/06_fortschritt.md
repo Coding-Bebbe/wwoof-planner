@@ -7,11 +7,11 @@
 ## 1. Aktueller Stand
 
 - **Phase 0 abgeschlossen (06.11.2026).**
-- **Phase 1 in Arbeit.** Die Schritte 1–4 sind erledigt und gepusht: Projektstruktur und README, erfundene Testdaten, CSV lesen (`src/farm_table.py`), nach Region filtern und Ergebnis schreiben (`src/filter_region.py`). Schritt 5 (Felder umwandeln, `src/farm_stats.py`) und Schritt 6 (Doppelungen erkennen) am 15.11.2026 von Claude Code umgesetzt.
+- **Phase 1 in Arbeit.** Die Schritte 1–4 sind erledigt und gepusht: Projektstruktur und README, erfundene Testdaten, CSV lesen (`src/farm_table.py`), nach Region filtern und Ergebnis schreiben (`src/filter_region.py`). Schritt 5 (Felder umwandeln, `src/farm_stats.py`) Schritt 6 (Doppelungen erkennen) und Schritt 7 (Vergleich mit pandas, `src/farm_pandas.py`) am 15.11.2026 von Claude Code umgesetzt.
 - **Umstellung am 15.11.2026:** Claude Code schreibt den Code schrittweise, der Nutzer prüft, lässt sich erklären und pusht selbst. Regeln in `CLAUDE.md`, Entscheidungen in Abschnitt 6 (15.11.2026), Anleitung in `docs/arbeiten_mit_claude_code.md`.
 - **Schritt 0 (Umstellung) umgesetzt am 15.11.2026**; Commit `Set up Claude Code workflow`, Push durch den Nutzer.
 - **Außerhalb des Schrittplans:** Die lokale Änderung an `src/filter_region.py` vom 11.11.2026 (Kommentare) hat der Nutzer behalten; eigener Commit `Phase 1: tidy comments in filter_region`.
-- **Nächster Schritt:** Phase 1, Schritt 7 (dieselbe Auswertung mit pandas).
+- **Nächster Schritt:** Phase 1, Schritt 8 (CSV-Format-Test mit Excel oder LibreOffice).
 
 ---
 
@@ -65,7 +65,7 @@ Seit 15.11.2026 schreibt Claude Code den Code; der Nutzer prüft. Den Test mit E
 | 4 | Nach Region filtern (`filter_by_region`) und Ergebnis nach `out/` schreiben (`write_farms`) | `Phase 1: filter farms by region and write result` | erledigt |
 | 5 | Felder umwandeln (Einzelheiten unten) | `Phase 1: parse list and number fields` | erledigt (15.11.2026) |
 | 6 | Doppelungen über `profile_url` erkennen und mit Hof-Codes melden | `Phase 1: detect duplicate profile URLs` | erledigt (15.11.2026) |
-| 7 | pandas: dieselbe Auswertung wie in den Schritten 4–6, Ergebnisse vergleichen | `Phase 1: explore farm table with pandas` | offen |
+| 7 | pandas: dieselbe Auswertung wie in den Schritten 4–6, Ergebnisse vergleichen | `Phase 1: explore farm table with pandas` | erledigt (15.11.2026) |
 | 8 | CSV-Format-Test: Vergleichsskript (Claude Code); der Nutzer öffnet eine Kopie in `out/` mit Excel oder LibreOffice, ändert, speichert; das Skript vergleicht. Format festlegen und in `docs/03_programmierprojekt.md`, Abschnitt 5.5, eintragen | `Phase 1: compare tables after spreadsheet round trip` | offen |
 | 9 | Abschluss: Verständnisfragen, README-Status, Tag `phase-1` | `Phase 1: complete` | offen |
 
@@ -255,3 +255,15 @@ Derzeit keine. Die offenen Punkte zur Reise und zum Sammler stehen in `docs/00_p
 | `find_duplicate_profile_urls` in `src/farm_table.py` | Gibt Gruppen von Hof-Codes mit gleicher `profile_url` zurück, in Dateireihenfolge; die URLs selbst nicht (Vorschlag von Claude Code, Einspruch möglich) | Harte Regel 5: Ausgaben ohne Hofdaten. Liegt in `farm_table.py`, damit der Sammler in Phase 5 die Prüfung wiederverwenden kann |
 | Vergleich | Exakt, Zeichen für Zeichen | Die Normalisierung legen wir in Phase 4 fest (Vormerkung in 4.3) |
 | `src/farm_stats.py` | Meldet `Duplicate profile URLs: 1 group` mit `DE-VA-001, DE-VA-003`; kein Abbruch | Abnahmekriterium der Phase („Doppelung wird gemeldet“) erfüllt. Mit erfundenen Listen geprüft: keine Doppelung, drei gleiche URLs, zwei getrennte Gruppen |
+
+### 15.11.2026 – Phase 1, Schritt 7: Vergleich mit pandas (Claude Code)
+
+| Thema | Ergebnis | Hinweise |
+|---|---|---|
+| `src/farm_pandas.py` | Berechnet Regionsfilter (für jede Region der Tabelle, mit Schreiben und Wiedereinlesen), Sortierung, Kategorien und Doppelungen mit csv und mit pandas und meldet je Auswertung `same` oder `DIFFERENT`; bei Abweichung Exit-Code 1. Mit der Testdatei: alles `same` | Abnahmekriterium der Phase („pandas liefert dieselben Ergebnisse“) erfüllt. Keine neuen Pakete (pandas 3.1.0 war installiert) |
+| Falle: fehlende Werte | Ohne `keep_default_na=False` macht pandas aus leeren Feldern und Texten wie `NA` oder `null` einen fehlenden Wert (NaN); mit erfundenem Hofnamen `NA` nachgewiesen | Deshalb `dtype=str` und `keep_default_na=False` beim Einlesen |
+| Falle: Sortierung | `sort_values` sortiert standardmäßig mit `quicksort`, nicht stabil. Bei 7 Zeilen blieb die Reihenfolge zufällig erhalten, bei 500 erfundenen Zeilen nicht | Deshalb `kind="stable"` |
+| Falle: Zahlprüfung | `pd.to_numeric` wäre lockerer als `parse_guestbook_count`; stattdessen Prüfung mit regulärem Ausdruck `[0-9]+`. Mit `" 12"`, `"+12"`, `"²"`, `"-1"` und leerem Feld geprüft: beide Wege lehnen ab, Meldung nur mit Hof-Code | – |
+| Kategorien | Vergleich ohne Reihenfolge, weil gleich häufige Kategorien in `most_common()` und `value_counts()` unterschiedlich geordnet sein können (für pandas 3.1 nicht geprüft) | – |
+| Dateinamen | Unterscheiden sich Regionsnamen nur in der Schreibung, bricht das Skript mit klarer Meldung ab, statt Dateien zu überschreiben | Umsetzung der Vormerkung aus Schritt 4 (Windows) |
+| Weitere Prüfung | Erfundene Tabelle mit leerem Kategorienfeld, `NA`/`null` in Textfeldern, mehrzeiliger Beschreibung mit `;` und Anführungszeichen, gleichen Gästebuchzahlen und drei Höfen mit gleicher URL: alles `same` | Prüfskript lag nur im Scratchpad; ab Phase 2 als pytest-Test |
