@@ -7,11 +7,11 @@
 ## 1. Aktueller Stand
 
 - **Phase 0 abgeschlossen (06.11.2026).**
-- **Phase 1 in Arbeit.** Die Schritte 1–4 sind erledigt und gepusht: Projektstruktur und README, erfundene Testdaten, CSV lesen (`src/farm_table.py`), nach Region filtern und Ergebnis schreiben (`src/filter_region.py`). Schritt 5 wurde am 08.11.2026 als Anleitung ausgegeben, aber nicht umgesetzt; `src/farm_stats.py` gibt es noch nicht.
+- **Phase 1 in Arbeit.** Die Schritte 1–4 sind erledigt und gepusht: Projektstruktur und README, erfundene Testdaten, CSV lesen (`src/farm_table.py`), nach Region filtern und Ergebnis schreiben (`src/filter_region.py`). Schritt 5 (Felder umwandeln, `src/farm_stats.py`) am 15.11.2026 von Claude Code umgesetzt.
 - **Umstellung am 15.11.2026:** Claude Code schreibt den Code schrittweise, der Nutzer prüft, lässt sich erklären und pusht selbst. Regeln in `CLAUDE.md`, Entscheidungen in Abschnitt 6 (15.11.2026), Anleitung in `docs/arbeiten_mit_claude_code.md`.
 - **Schritt 0 (Umstellung) umgesetzt am 15.11.2026**; Commit `Set up Claude Code workflow`, Push durch den Nutzer.
 - **Außerhalb des Schrittplans:** Die lokale Änderung an `src/filter_region.py` vom 11.11.2026 (Kommentare) hat der Nutzer behalten; eigener Commit `Phase 1: tidy comments in filter_region`.
-- **Nächster Schritt:** Phase 1, Schritt 5.
+- **Nächster Schritt:** Phase 1, Schritt 6 (Doppelungen über `profile_url` erkennen).
 
 ---
 
@@ -63,7 +63,7 @@ Seit 15.11.2026 schreibt Claude Code den Code; der Nutzer prüft. Den Test mit E
 | 2 | Erfundene Testdaten `tests/fixtures/farms_sample.csv` (5 Zeilen, 4 Höfe; DE-VA-003 doppelt zu DE-VA-001) | `Phase 1: add invented test farms` | erledigt |
 | 3 | CSV lesen: `src/farm_table.py` (`read_farms` mit Spaltenprüfung), `src/filter_region.py` | `Phase 1: read farm table` | erledigt |
 | 4 | Nach Region filtern (`filter_by_region`) und Ergebnis nach `out/` schreiben (`write_farms`) | `Phase 1: filter farms by region and write result` | erledigt |
-| 5 | Felder umwandeln (Einzelheiten unten) | `Phase 1: parse list and number fields` | offen |
+| 5 | Felder umwandeln (Einzelheiten unten) | `Phase 1: parse list and number fields` | erledigt (15.11.2026) |
 | 6 | Doppelungen über `profile_url` erkennen und mit Hof-Codes melden | `Phase 1: detect duplicate profile URLs` | offen |
 | 7 | pandas: dieselbe Auswertung wie in den Schritten 4–6, Ergebnisse vergleichen | `Phase 1: explore farm table with pandas` | offen |
 | 8 | CSV-Format-Test: Vergleichsskript (Claude Code); der Nutzer öffnet eine Kopie in `out/` mit Excel oder LibreOffice, ändert, speichert; das Skript vergleicht. Format festlegen und in `docs/03_programmierprojekt.md`, Abschnitt 5.5, eintragen | `Phase 1: compare tables after spreadsheet round trip` | offen |
@@ -73,7 +73,7 @@ Seit 15.11.2026 schreibt Claude Code den Code; der Nutzer prüft. Den Test mit E
 
 - In `src/farm_table.py`:
   - `split_list(value)`: teilt ein Listenfeld am Trennzeichen `LIST_SEPARATOR`; ein leeres Feld ergibt eine leere Liste (Falle: `"".split("|")` ergibt `['']`).
-  - `parse_guestbook_count(farm)`: liefert `guestbook_count` als ganze Zahl ab 0; sonst `ValueError` mit Hof-Code im Text, z. B. `DE-VA-001: guestbook_count is not a whole number >= 0: 'zwölf'`.
+  - `parse_guestbook_count(farm)`: liefert `guestbook_count` als ganze Zahl ab 0; sonst `ValueError` mit Hof-Code und Länge, aber ohne den fehlerhaften Wert, z. B. `DE-VA-001: guestbook_count is not a whole number >= 0 (length 5)` (geändert am 15.11.2026, siehe Abschnitt 6).
 - Neues Skript `src/farm_stats.py`: Höfe nach Gästebucheinträgen absteigend (stabile Sortierung), Anzahl der Höfe pro Lernkategorie; Ausgabe nur Hof-Codes, Zahlen und Kategorienamen.
 - Erwartung mit der Testdatei: DE-SN-001 27, DE-VA-001 12, DE-VA-003 12, DE-SN-002 3, DE-VA-002 0; Tierhaltung 3 (wegen der Doppelung), Gemüsebau 3, Käseherstellung 2, übrige Kategorien 1.
 
@@ -237,3 +237,12 @@ Derzeit keine. Die offenen Punkte zur Reise und zum Sammler stehen in `docs/00_p
 | `src/filter_region.py` | Lokale Änderung vom 11.11.2026 (Docstring zu Kommentar, Hinweis auf `config.yaml` entfernt) gehört nicht zu Schritt 0; der Nutzer hat sie behalten, eigener Commit `Phase 1: tidy comments in filter_region` | Empfehlung von Claude Code war: Docstring behalten (Python-Konvention, `help()` zeigt ihn an). Kann in Schritt 5 wieder aufgegriffen werden. |
 | Commits ohne Mitautor | Vorgabe des Nutzers: Commits enthalten keine `Co-Authored-By`-Zeile und keinen Hinweis auf Claude als Mitautor. Eingetragen in `CLAUDE.md`, Abschnitt „Konventionen“ | Gilt auch, wenn das Werkzeug selbst eine solche Zeile vorschlägt |
 | `.claude/settings.json`: Freigaben | Vom Nutzer ergänzt: `PowerShell(git status *)` und `PowerShell(git log *)` (nur lesende Befehle); Einrückung von Claude Code korrigiert | Nicht geprüft: ob die Muster auch die Befehle ohne Argumente erfassen |
+
+### 15.11.2026 – Phase 1, Schritt 5: Felder umwandeln (Claude Code)
+
+| Thema | Ergebnis | Hinweise |
+|---|---|---|
+| Fehlertext von `parse_guestbook_count` | Entscheidung des Nutzers: Die Meldung nennt Hof-Code und Länge des Werts, aber nicht den Wert selbst (abweichend vom Entwurf vom 08.11.2026) | Harte Regel 5 in `CLAUDE.md`: Fehlermeldungen nur mit Hof-Codes, Zahlen und Status. Schreibt der Sammler versehentlich Profiltext in das Feld, gelangt er so nicht in Ausgaben |
+| Prüfung von `guestbook_count` | Nur ASCII-Ziffern zulässig (`isascii()` und `isdigit()`), dann `int()` (Vorschlag von Claude Code, Einspruch möglich) | `int()` allein nimmt auch `" 12"`, `"+12"`, `"1_000"`; `isdigit()` allein nimmt auch `"²"`. Mit erfundenen Werten geprüft |
+| `src/farm_stats.py` | Ausgabe mit der Testdatei wie erwartet: DE-SN-001 27, DE-VA-001 12, DE-VA-003 12, DE-SN-002 3, DE-VA-002 0; Tierhaltung 3, Gemüsebau 3, Käseherstellung 2, übrige 1 | Gleich viele Einträge behalten die Reihenfolge aus der Datei (stabile Sortierung, auch mit `reverse=True`) |
+| Prüfbefehle unter PowerShell 5.1 | `python -c` mit Anführungszeichen im Code scheitert, weil PowerShell 5.1 innere Anführungszeichen beim Weitergeben an Programme entfernt | Für Ad-hoc-Prüfungen ein kleines Skript verwenden; ab Phase 2 pytest |

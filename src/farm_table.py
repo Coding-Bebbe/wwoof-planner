@@ -44,6 +44,34 @@ def read_farms(path: Path) -> list[dict[str, str]]:
     return farms
 
 
+def split_list(value: str) -> list[str]:
+    """Split a list field at LIST_SEPARATOR.
+
+    An empty field gives an empty list. Without this check,
+    "".split("|") would return [''], a list with one empty entry.
+    """
+    if value == "":
+        return []
+    return value.split(LIST_SEPARATOR)
+
+
+def parse_guestbook_count(farm: dict[str, str]) -> int:
+    """Return guestbook_count of a farm as a whole number >= 0.
+
+    Only ASCII digits are accepted. int() alone would also accept " 12 ",
+    "+12" and "1_000"; isdigit() alone would also accept "²".
+    The error message contains the farm code but not the faulty value,
+    so that no farm data can end up in logs (hard rule 5 in CLAUDE.md).
+    """
+    value = farm["guestbook_count"]
+    if not (value.isascii() and value.isdigit()):
+        raise ValueError(
+            f"{farm['farm_code']}: guestbook_count is not a whole number >= 0 "
+            f"(length {len(value)})"
+        )
+    return int(value)
+
+
 def write_farms(path: Path, farms: list[dict[str, str]]) -> None:
     """Write farms to a farm table. An existing file is replaced."""
     path.parent.mkdir(parents=True, exist_ok=True)
