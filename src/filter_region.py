@@ -5,15 +5,14 @@ from pathlib import Path
 
 from src.farm_table import read_farms, write_farms
 
-# Settings for phase 1; from phase 2 on they come from config.yaml.
+# Settings for phase 1
 INPUT_PATH = Path("tests/fixtures/farms_sample.csv")
 REGION = "voralpenland"
 OUTPUT_PATH = Path("out") / f"farms_{REGION}.csv"
 
 
+# Return the farms whose region equals the given region.
 def filter_by_region(farms: list[dict[str, str]], region: str) -> list[dict[str, str]]:
-    """Return the farms whose region equals the given region."""
-    # Step 4 task: build and return a new list with the matching farms.
     matching_farms = []
     for i in farms:
         if i["region"] == region:
