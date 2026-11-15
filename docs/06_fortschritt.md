@@ -7,11 +7,11 @@
 ## 1. Aktueller Stand
 
 - **Phase 0 abgeschlossen (06.11.2026).**
-- **Phase 1 in Arbeit.** Die Schritte 1–4 sind erledigt und gepusht: Projektstruktur und README, erfundene Testdaten, CSV lesen (`src/farm_table.py`), nach Region filtern und Ergebnis schreiben (`src/filter_region.py`). Schritt 5 (Felder umwandeln, `src/farm_stats.py`) am 15.11.2026 von Claude Code umgesetzt.
+- **Phase 1 in Arbeit.** Die Schritte 1–4 sind erledigt und gepusht: Projektstruktur und README, erfundene Testdaten, CSV lesen (`src/farm_table.py`), nach Region filtern und Ergebnis schreiben (`src/filter_region.py`). Schritt 5 (Felder umwandeln, `src/farm_stats.py`) und Schritt 6 (Doppelungen erkennen) am 15.11.2026 von Claude Code umgesetzt.
 - **Umstellung am 15.11.2026:** Claude Code schreibt den Code schrittweise, der Nutzer prüft, lässt sich erklären und pusht selbst. Regeln in `CLAUDE.md`, Entscheidungen in Abschnitt 6 (15.11.2026), Anleitung in `docs/arbeiten_mit_claude_code.md`.
 - **Schritt 0 (Umstellung) umgesetzt am 15.11.2026**; Commit `Set up Claude Code workflow`, Push durch den Nutzer.
 - **Außerhalb des Schrittplans:** Die lokale Änderung an `src/filter_region.py` vom 11.11.2026 (Kommentare) hat der Nutzer behalten; eigener Commit `Phase 1: tidy comments in filter_region`.
-- **Nächster Schritt:** Phase 1, Schritt 6 (Doppelungen über `profile_url` erkennen).
+- **Nächster Schritt:** Phase 1, Schritt 7 (dieselbe Auswertung mit pandas).
 
 ---
 
@@ -64,7 +64,7 @@ Seit 15.11.2026 schreibt Claude Code den Code; der Nutzer prüft. Den Test mit E
 | 3 | CSV lesen: `src/farm_table.py` (`read_farms` mit Spaltenprüfung), `src/filter_region.py` | `Phase 1: read farm table` | erledigt |
 | 4 | Nach Region filtern (`filter_by_region`) und Ergebnis nach `out/` schreiben (`write_farms`) | `Phase 1: filter farms by region and write result` | erledigt |
 | 5 | Felder umwandeln (Einzelheiten unten) | `Phase 1: parse list and number fields` | erledigt (15.11.2026) |
-| 6 | Doppelungen über `profile_url` erkennen und mit Hof-Codes melden | `Phase 1: detect duplicate profile URLs` | offen |
+| 6 | Doppelungen über `profile_url` erkennen und mit Hof-Codes melden | `Phase 1: detect duplicate profile URLs` | erledigt (15.11.2026) |
 | 7 | pandas: dieselbe Auswertung wie in den Schritten 4–6, Ergebnisse vergleichen | `Phase 1: explore farm table with pandas` | offen |
 | 8 | CSV-Format-Test: Vergleichsskript (Claude Code); der Nutzer öffnet eine Kopie in `out/` mit Excel oder LibreOffice, ändert, speichert; das Skript vergleicht. Format festlegen und in `docs/03_programmierprojekt.md`, Abschnitt 5.5, eintragen | `Phase 1: compare tables after spreadsheet round trip` | offen |
 | 9 | Abschluss: Verständnisfragen, README-Status, Tag `phase-1` | `Phase 1: complete` | offen |
@@ -93,6 +93,7 @@ Seit 15.11.2026 schreibt Claude Code den Code; der Nutzer prüft. Den Test mit E
 | 2 | Regionswerte aus `config.yaml` und Tabelle müssen exakt übereinstimmen (Groß- und Kleinschreibung); Warnung bei 0 Treffern erwägen | Schritt 4, 08.11.2026 |
 | 2 | Tests laufen bei jedem Push automatisch auf GitHub (GitHub Actions) | Entscheidung vom 15.11.2026 |
 | 4 | Prüfen, ob eine Lernkategorie der Plattform das Zeichen `\|` enthält; sonst würde `split_list` sie zerlegen | 15.11.2026 |
+| 4 | Regel für die Normalisierung von `profile_url` festlegen und in `find_duplicate_profile_urls` übernehmen (bis dahin exakter Vergleich) | Schritt 6, 15.11.2026 |
 | 5 | Der Sammler löst einen Fehler aus, wenn ein Listenwert das Trennzeichen enthält, statt ihn falsch zu speichern | Vorschlag von Claude, 15.11.2026 (Einspruch möglich) |
 | alle | Dateinamen nicht aus Werten ableiten, die sich nur in der Schreibung unterscheiden (Windows) | Schritt 4, 08.11.2026 |
 
@@ -246,3 +247,11 @@ Derzeit keine. Die offenen Punkte zur Reise und zum Sammler stehen in `docs/00_p
 | Prüfung von `guestbook_count` | Nur ASCII-Ziffern zulässig (`isascii()` und `isdigit()`), dann `int()` (Vorschlag von Claude Code, Einspruch möglich) | `int()` allein nimmt auch `" 12"`, `"+12"`, `"1_000"`; `isdigit()` allein nimmt auch `"²"`. Mit erfundenen Werten geprüft |
 | `src/farm_stats.py` | Ausgabe mit der Testdatei wie erwartet: DE-SN-001 27, DE-VA-001 12, DE-VA-003 12, DE-SN-002 3, DE-VA-002 0; Tierhaltung 3, Gemüsebau 3, Käseherstellung 2, übrige 1 | Gleich viele Einträge behalten die Reihenfolge aus der Datei (stabile Sortierung, auch mit `reverse=True`) |
 | Prüfbefehle unter PowerShell 5.1 | `python -c` mit Anführungszeichen im Code scheitert, weil PowerShell 5.1 innere Anführungszeichen beim Weitergeben an Programme entfernt | Für Ad-hoc-Prüfungen ein kleines Skript verwenden; ab Phase 2 pytest |
+
+### 15.11.2026 – Phase 1, Schritt 6: Doppelungen erkennen (Claude Code)
+
+| Thema | Ergebnis | Hinweise |
+|---|---|---|
+| `find_duplicate_profile_urls` in `src/farm_table.py` | Gibt Gruppen von Hof-Codes mit gleicher `profile_url` zurück, in Dateireihenfolge; die URLs selbst nicht (Vorschlag von Claude Code, Einspruch möglich) | Harte Regel 5: Ausgaben ohne Hofdaten. Liegt in `farm_table.py`, damit der Sammler in Phase 5 die Prüfung wiederverwenden kann |
+| Vergleich | Exakt, Zeichen für Zeichen | Die Normalisierung legen wir in Phase 4 fest (Vormerkung in 4.3) |
+| `src/farm_stats.py` | Meldet `Duplicate profile URLs: 1 group` mit `DE-VA-001, DE-VA-003`; kein Abbruch | Abnahmekriterium der Phase („Doppelung wird gemeldet“) erfüllt. Mit erfundenen Listen geprüft: keine Doppelung, drei gleiche URLs, zwei getrennte Gruppen |

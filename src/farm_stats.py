@@ -7,7 +7,12 @@ import sys
 from collections import Counter
 from pathlib import Path
 
-from src.farm_table import parse_guestbook_count, read_farms, split_list
+from src.farm_table import (
+    find_duplicate_profile_urls,
+    parse_guestbook_count,
+    read_farms,
+    split_list,
+)
 
 # Settings for phase 1
 INPUT_PATH = Path("tests/fixtures/farms_sample.csv")
@@ -48,6 +53,15 @@ def main() -> None:
     print("\nFarms per learning category:")
     for category, count in count_learning_categories(farms).most_common():
         print(f"  {count:>4}  {category}")
+
+    duplicates = find_duplicate_profile_urls(farms)
+    if not duplicates:
+        print("\nDuplicate profile URLs: none")
+    else:
+        word = "group" if len(duplicates) == 1 else "groups"
+        print(f"\nDuplicate profile URLs: {len(duplicates)} {word}")
+        for codes in duplicates:
+            print(f"  {', '.join(codes)}")
 
 
 if __name__ == "__main__":

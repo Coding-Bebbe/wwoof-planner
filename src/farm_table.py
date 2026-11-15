@@ -72,6 +72,23 @@ def parse_guestbook_count(farm: dict[str, str]) -> int:
     return int(value)
 
 
+def find_duplicate_profile_urls(farms: list[dict[str, str]]) -> list[list[str]]:
+    """Return groups of farm codes that share the same profile_url.
+
+    Only groups with more than one farm are returned, in file order.
+    The result contains farm codes only, no URLs, so that it can be
+    printed without farm data (hard rule 5 in CLAUDE.md).
+    URLs are compared exactly as stored; how to normalise them is
+    decided in phase 4.
+    """
+    codes_by_url: dict[str, list[str]] = {}
+    for farm in farms:
+        # setdefault returns the list for this URL, creating an empty one first if needed.
+        codes_by_url.setdefault(farm["profile_url"], []).append(farm["farm_code"])
+
+    return [codes for codes in codes_by_url.values() if len(codes) > 1]
+
+
 def write_farms(path: Path, farms: list[dict[str, str]]) -> None:
     """Write farms to a farm table. An existing file is replaced."""
     path.parent.mkdir(parents=True, exist_ok=True)
