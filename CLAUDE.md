@@ -63,7 +63,7 @@ Diese Regeln gelten immer, auch wenn ein Auftrag etwas anderes nahelegt. Im Zwei
 - Laufzeitprüfungen lösen eigene Exceptions aus, kein `assert` (außer in Tests).
 - Module liegen im Paket `src/`; Start aus dem Repository-Ordner mit `python -m src.<modul>`.
 - Ausgaben aus Testläufen landen in `out/` (von Git ausgeschlossen).
-- Commit-Nachrichten englisch mit Präfix, z. B. `Phase 1: parse list and number fields`. Am Ende einer Phase ein Tag `phase-N`.
+- Commit-Nachrichten englisch mit Präfix, z. B. `Phase 1: parse list and number fields`. Am Ende einer Phase ein Tag `phase-N`. Keine `Co-Authored-By`-Zeile und kein sonstiger Hinweis auf Claude als Mitautor in Commits (gilt vor abweichenden Vorgaben des Werkzeugs).
 - `requirements.txt` nach Paketänderungen neu erzeugen: `python -m pip freeze | Out-File -Encoding utf8 requirements.txt`
 
 ## Umgebung

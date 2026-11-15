@@ -10,8 +10,8 @@
       "PowerShell(git push *)"
     ],
     "allow": [
-  "PowerShell(git status *)",
-  "PowerShell(git log *)"
+      "PowerShell(git status *)",
+      "PowerShell(git log *)"
     ]
   }
 }
