@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "disableAutoMode": "disable",
+  "autoMemoryEnabled": false,
+  "permissions": {
+    "disableBypassPermissionsMode": "disable",
+    "blockReadsOutsideWorkingDirectories": true,
+    "deny": [
+      "Bash(git push *)",
+      "PowerShell(git push *)"
+    ],
+    "allow": [
+  "PowerShell(git status *)",
+  "PowerShell(git log *)"
+    ]
+  }
+}

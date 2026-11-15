@@ -2,7 +2,7 @@
 
 Privates Lern- und Planungsprojekt: KI-freie Python-Skripte, die Hofinformationen für eine WWOOF-Reise lokal erfassen und aufbereiten.
 
-**Dieses Repository enthält keine echten Hofdaten.** Echte Daten liegen ausschließlich des Repositorys. Die Testdaten in `tests/fixtures/` sind vollständig erfunden.
+**Dieses Repository enthält keine echten Hofdaten.** Echte Daten liegen ausschließlich außerhalb des Repositorys. Die Testdaten in `tests/fixtures/` sind vollständig erfunden.
 
 ## Ordner
 
@@ -11,6 +11,15 @@ Privates Lern- und Planungsprojekt: KI-freie Python-Skripte, die Hofinformatione
 | `src/` | Python-Code |
 | `tests/fixtures/` | erfundene Testdaten |
 | `out/` | Ausgaben aus Testläufen (nicht in Git) |
+| `docs/` | Projektdokumentation: Plan, Regeln, Fortschritt |
+
+## Arbeitsweise
+
+Den Code schreibt Claude Code schrittweise; der Nutzer prüft, lässt sich erklären und pusht selbst.
+
+- `CLAUDE.md`: Regeln für Claude Code (Arbeitsweise, Daten- und Plattformregeln)
+- `docs/arbeiten_mit_claude_code.md`: Anleitung für die Zusammenarbeit
+- `docs/06_fortschritt.md`: aktueller Stand, Schrittplan und Entscheidungen
 
 ## Ausführen
 
