@@ -1,6 +1,6 @@
 # Arbeiten mit Claude Code in diesem Projekt
 
-**Stand:** 15.11.2026, ergänzt am 17.11.2026 (Länderseiten der CWP, `docs/07_bedienung.md`) · Anleitung für dich. Die Regeln für Claude Code selbst stehen in `CLAUDE.md`.
+**Stand:** 17.11.2026 · Anleitung für dich. Die Regeln für Claude Code selbst stehen in `CLAUDE.md`.
 
 ---
 
@@ -90,7 +90,7 @@ Claude Code fragt vor jedem Befehl. Einige rein lesende Befehle wie `ls`, `cat`,
 
 **Ablehnen:**
 - alles, was `wwoof-data` enthält
-- Skripte mit echter Konfiguration oder echten Daten (Sammler, Stichworte, Bereinigung, Export ohne Testpfad)
+- Skripte mit echter Konfiguration oder echten Daten (Erkundung, Sammler, Stichworte und Steckbrief, Export ohne Testpfad)
 - alles mit einer Länderseite der CWP (z. B. wwoof.de, wwoofnorway.org) oder api.wwoof.net
 - `git add .` oder `git add -A`
 - Löschbefehle außerhalb von `out/`
@@ -141,7 +141,7 @@ Fragen, die beim Lernen helfen:
 
 ## 10. Datenschutz im Alltag
 
-- **Echte Läufe (ab Phase 5) startest nur du**, in einem eigenen PowerShell-Fenster außerhalb von VS Code. Wie, beschreibt `docs/07_bedienung.md`, Teil A (Länderseite und Region in `config.yaml` wählen, starten, einloggen).
+- **Echte Läufe (ab Phase 2: Erkundung, ab Phase 3: Sammler) startest nur du**, in einem eigenen PowerShell-Fenster außerhalb von VS Code. Wie, beschreibt `docs/07_bedienung.md`, Teil A. Struktur-Skelette teilst du erst nach der Prüfung in Teil A.0.
 - Öffne **keine Dateien aus `wwoof-data` in VS Code**, solange das Claude-Panel offen ist. Echte Tabellen öffnest du in Excel oder LibreOffice.
 - Keine Screenshots, Links oder Textauszüge echter Hofseiten in den Chat; stattdessen Platzhalter wie `<FARM_NAME>`.
 - Fragt Claude Code nach `wwoof-data` oder will es einen echten Lauf starten: ablehnen und darauf hinweisen. Das ist ein Fehler, den wir beheben.
@@ -154,9 +154,9 @@ Fragen, die beim Lernen helfen:
 - **Pro Schritt ein Commit** (Claude Code nach deinem OK), danach **`git push`** (du).
 - **Ende einer Phase:** Claude Code aktualisiert den Status in `README.md` und setzt nach deinem OK einen Tag `phase-N`. Du pushst ihn mit `git push origin phase-N`.
 - **Ab Phase 2: GitHub Actions.** Nach jedem Push laufen die Tests auf GitHub. Das Ergebnis siehst du im Reiter „Actions“ des Repositorys und als Häkchen oder Kreuz am Commit.
-- **`docs/06_fortschritt.md`** ist das Logbuch des Projekts: Stand, Schrittplan, Entscheidungen, Funde. Auf GitHub jederzeit lesbar.
+- **`docs/06_fortschritt.md`** zeigt den aktuellen Stand und den Schrittplan; Claude Code lädt die Datei in jeder Sitzung, deshalb bleibt sie kurz. **`docs/08_entscheidungsprotokoll.md`** ist das Logbuch mit allen Entscheidungen und Funden. Beides ist auf GitHub jederzeit lesbar.
 - **`docs/07_bedienung.md`** ist die Bedienungsanleitung des Sammlers. Sie wächst mit den Phasen; eine Phase ist erst fertig, wenn dort ihre neuen Teile beschrieben sind.
-- **claude.ai-Projekt:** nur noch für die Reiseplanung. Den Export (Phase 7) lädst du dort hoch.
+- **claude.ai-Projekt:** nur noch für die Reiseplanung. Den Export (Phasen 4 und 6) lädst du dort hoch, in Phase 2 auch die Attrappe mit erfundenen Höfen.
 
 ---
 

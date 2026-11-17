@@ -1,6 +1,6 @@
 # Regeln und Rahmenbedingungen
 
-**Stand:** 01.11.2026, ergänzt am 15.11.2026 (Abschnitt 6) und am 17.11.2026 (alle Länderseiten der CWP: Abschnitte 1–6). Dies ist keine Rechtsberatung; die rechtlichen Punkte sind eine Einordnung.
+**Stand:** 17.11.2026 · Maßgeblich für Absprachen und Datenregeln, auch dafür, was geteilt werden darf. Dies ist keine Rechtsberatung; die rechtlichen Punkte sind eine Einordnung.
 
 ---
 
@@ -25,7 +25,7 @@ Der Nutzer hat bei den WWOOF-Organisationen jeweils nachgefragt. Die Antworten l
 
 **Geltungsbereich der Abklärung (vom Nutzer bestätigt am 17.11.2026):** Abgeklärt hat der Nutzer mit WWOOF Deutschland und mit dem Plattformbetreiber (Federation of WWOOF Organisations, FoWO, Betreiber der CWP). Laut Nutzer gilt die Abklärung für **alle Länderseiten der Common WWOOF Platform**, nicht nur für wwoof.de. Sie wird hier einmal festgehalten und nicht je Länderseite wiederholt. Für jede weitere Länderseite bleiben trotzdem eine eigene Mitgliedschaft und die Checkliste in `07_bedienung.md`, Teil C, nötig. Länderseiten außerhalb der CWP (z. B. wwoof.ie) gehören nicht zum Umfang (Abschnitt 3.2).
 
-Laut Nutzer umfasst die Abklärung auch die Weitergabe **bereinigter, vom Nutzer freigegebener Beschreibungen** an Claude (bestätigt am 01.11.2026).
+Laut Nutzer umfasst die Abklärung auch die Weitergabe **bereinigter, vom Nutzer freigegebener Beschreibungen** an Claude (bestätigt am 01.11.2026). Seit dem 17.11.2026 geht weniger an Claude: aus Beschreibungen nur Stichwort-Kategorien und der Steckbrief (Abschnitt 2).
 
 **Entscheidung des Nutzers (31.10.2026):** Hofnamen gehen nicht an Claude. Sie stehen nur in der lokalen Tabelle des KI-freien Skripts; Claude arbeitet mit Hof-Codes.
 
@@ -45,14 +45,28 @@ Laut Nutzer umfasst die Abklärung auch die Weitergabe **bereinigter, vom Nutzer
 | Stichwort-Kategorien aus der Taxonomie | Kontaktdaten (Telefon, E-Mail, Website, Social Media) |
 | Anzahl der Gästebucheinträge (nur die Zahl) | Profil-Links, Benutzernamen, Profil-IDs |
 | Freie Zeitfenster (aus dem Kalender) | Fotos, Screenshots von Hofseiten |
-| Unterkunft, Arbeitszeiten, Sprache, Abholung (als Kategorie) | Originalbeschreibung (unbereinigt) |
+| **Steckbrief:** nur Schlüssel und Werte aus festem Schema, z. B. Unterkunft, Arbeitszeiten, Abholung (`03_programmierprojekt.md`, Abschnitt 7) | Originalbeschreibung und jeder andere Freitext aus Profilen |
 | Eigene Notizen und Einschätzungen ohne Personenbezug (z. B. „großer Gemüsegarten“) | Gästebuchtexte (das Skript speichert sie gar nicht) |
-| **Bereinigte Beschreibung:** nur mit Freigabe des Nutzers | Nachrichten der Hosts im Wortlaut, HTML-Quelltext von Hofseiten |
+| **Struktur-Skelett** einer Seite (alle Texte und Attributwerte durch Platzhalter ersetzt), nach Prüfung durch den Nutzer | Nachrichten der Hosts im Wortlaut; HTML-Quelltext und gesicherte Seiten (`local/samples/`) |
 | | Browser-Profil mit Login-Sitzung |
 
-**„Bereinigt“ heißt:** Hofname, Personennamen, Kontakt- und Adressdaten sind entfernt, und der Nutzer hat den Text gelesen und freigegeben. Das Verfahren beschreibt `03_programmierprojekt.md`, Abschnitt 7.
+**Hof-Codes und Platzhalter:** Claude bezeichnet Höfe ausschließlich mit Hof-Codes. Nachrichtenentwürfe enthalten Platzhalter `[HOFNAME]` und `[NAME]`, die der Nutzer selbst einsetzt.
 
 **Antworten der Hosts** gehen nur zusammengefasst an Claude, z. B. „DE-VA-003: Zusage 14.–28.4., Abholung am Bahnhof möglich“.
+
+**Teilen beim Arbeiten mit Claude Code:**
+
+| Darf geteilt werden | Bitte nicht teilen |
+|---|---|
+| Code, Konfiguration, Länderseiten-Dateien | HTML-Quelltext von Hofseiten, gesicherte Seiten aus `local/samples/` |
+| Fehlermeldungen und Tracebacks ohne Hofdaten | Screenshots von Hofseiten |
+| Selektoren mit Platzhaltern (z. B. `<FARM_NAME>`) | Inhalte aus `wwoof-data/` (Hofnamen, Originalbeschreibungen, Notizen im Rohzustand) |
+| Struktur-Skelette aus `local/structure/`, nachdem der Nutzer sie geprüft hat (Checkliste in `07_bedienung.md`, Teil A.0) | Log-Zeilen mit Hofnamen, Links oder Texten |
+| Strukturbeschreibungen („Die Beschreibung steht in einem Element mit der Klasse X“) | Echte Hofnamen in Selektoren |
+| Zahlen, z. B. ungefähre Hofzahlen je Region | Gästebuchtexte |
+| Testdaten mit erfundenen Höfen; den Export aus `wwoof-data/export/` | Das Browser-Profil |
+
+Vor dem Teilen ersetzt der Nutzer Hofnamen, Links und Textauszüge durch Platzhalter. Betrifft eine Rückfrage von Claude Code `wwoof-data\`, eine Länderseite oder api.wwoof.net, lehnt der Nutzer ab; das ist ein Fehler, den wir beheben.
 
 **Technische Trennung (Entscheidung vom 01.11.2026):** Alle Hofdaten liegen im Datenordner `wwoof-data/` außerhalb des Code-Repositorys. Claude erhält darauf keinen Zugriff und fragt in Claude Code auch nicht danach; eine Read-Deny-Regel sperrt den Ordner zusätzlich (Einrichtung in Phase 0). Claude startet keine Skripte, die eine Länderseite der CWP oder api.wwoof.net aufrufen oder echte Hofdaten verarbeiten. Den Export lädt der Nutzer selbst hoch. Details: `03_programmierprojekt.md`, Abschnitt 5.1.
 
@@ -69,8 +83,8 @@ Laut Nutzer umfasst die Abklärung auch die Weitergabe **bereinigter, vom Nutzer
   - personenbezogene Daten zum eigenen Profit sammeln, durch Data-Mining auswerten oder abgreifen
   - Robot-Exclusion-Header oder technische Schutzmaßnahmen umgehen oder stören
   - Spam, definiert als dieselbe Nachricht an 10 oder mehr Mitglieder
-- **Automatisierte Zugriffe:** Den Volltext konnte Claude nicht lesen, weil das Hilfecenter den Abruf per Bot-Erkennung blockiert hat (das wurde nicht umgangen). Die Frage, ob automatisierte Zugriffe verboten sind, ist laut Nutzer durch die Abklärung mit WWOOF erledigt (Abschnitt 1): Das Skript und die Vorgehensweise sind in Ordnung, Massenabrufe und direktes KI-Browsing sind ausgeschlossen. Das **Gate vor Phase 4** ist damit erfüllt; die Abklärung gilt für alle Länderseiten der CWP (Abschnitt 1).
-- **Datenschutzerklärung der CWP:** Zu den Angaben über die landwirtschaftliche Tätigkeit, die einen Host identifizieren können, zählt sie ausdrücklich den **Hofnamen** sowie weitere Profilangaben wie die **Beschreibung** und Angaben zu den Mitbewohnern. Daraus folgen die Entscheidungen zu Hof-Codes und zur Bereinigung der Beschreibungen.
+- **Automatisierte Zugriffe:** Den Volltext konnte Claude nicht lesen, weil das Hilfecenter den Abruf per Bot-Erkennung blockiert hat (das wurde nicht umgangen). Die Frage, ob automatisierte Zugriffe verboten sind, ist laut Nutzer durch die Abklärung mit WWOOF erledigt (Abschnitt 1): Das Skript und die Vorgehensweise sind in Ordnung, Massenabrufe und direktes KI-Browsing sind ausgeschlossen. Das **Gate vor der Erkundung** (Phase 2) ist damit erfüllt; die Abklärung gilt für alle Länderseiten der CWP (Abschnitt 1).
+- **Datenschutzerklärung der CWP:** Zu den Angaben über die landwirtschaftliche Tätigkeit, die einen Host identifizieren können, zählt sie ausdrücklich den **Hofnamen** sowie weitere Profilangaben wie die **Beschreibung** und Angaben zu den Mitbewohnern. Daraus folgen die Entscheidungen zu Hof-Codes und dazu, dass aus Beschreibungen nur Kategorien und Steckbrief an Claude gehen.
 
 ### 3.2 WWOOF Ireland (eigene Plattform, Bedingungen vollständig gelesen)
 
@@ -107,19 +121,21 @@ Laut Nutzer umfasst die Abklärung auch die Weitergabe **bereinigter, vom Nutzer
 **Erledigt:**
 - Hofname an Claude: entfällt, weil Hofnamen lokal bleiben (Entscheidung vom 31.10.2026).
 - Nutzungsbeschränkungen der CWP (Verbot automatisierter Zugriffe?): laut Nutzer durch die Abklärung mit WWOOF erledigt (01.11.2026).
-- Beschreibungen an Claude: Bereinigte, vom Nutzer freigegebene Beschreibungen dürfen laut Nutzer an Claude gehen; die Abklärung mit WWOOF umfasst das (01.11.2026).
+- Beschreibungen an Claude: laut Nutzer von der Abklärung mit WWOOF umfasst (01.11.2026); seit 17.11.2026 gehen aus Beschreibungen nur Kategorien und Steckbrief an Claude (Abschnitt 2).
 
 ---
 
 ## 5. Gesetzlicher Rahmen (Einordnung, keine Rechtsberatung)
 
 - **Datenschutz, Haushaltsausnahme (Art. 2 Abs. 2 lit. c DSGVO):** Die DSGVO gilt nicht für Verarbeitungen durch natürliche Personen zur Ausübung ausschließlich persönlicher oder familiärer Tätigkeiten. Private Reiseplanung fällt sehr wahrscheinlich darunter. Die genauen Grenzen sind aber offen: Der BGH hat dem EuGH im September 2026 Fragen dazu vorgelegt (I ZR 256/25, I ZR 289/25). Daraus folgt: so wenige Personendaten wie möglich.
-- **Datenbankrecht (§ 87b UrhG):** Dem Datenbankhersteller steht das Recht zu, die Datenbank insgesamt oder wesentliche Teile davon zu vervielfältigen. Dem gleichgestellt ist die wiederholte und systematische Vervielfältigung unwesentlicher Teile, wenn sie der normalen Auswertung zuwiderläuft oder berechtigte Interessen unzumutbar beeinträchtigt. Daraus folgt: nur einzelne Regionen, keine Gesamtliste, auf jeder Länderseite. Gesamtumfang und Tagesgrenze werden vor Phase 5 festgelegt, auch ob sie je Länderseite oder insgesamt gelten (`00_projekt_uebersicht.md`, offener Punkt 11).
+- **Datenbankrecht (§ 87b UrhG):** Dem Datenbankhersteller steht das Recht zu, die Datenbank insgesamt oder wesentliche Teile davon zu vervielfältigen. Dem gleichgestellt ist die wiederholte und systematische Vervielfältigung unwesentlicher Teile, wenn sie der normalen Auswertung zuwiderläuft oder berechtigte Interessen unzumutbar beeinträchtigt. Daraus folgt: nur einzelne Regionen, keine Gesamtliste, auf jeder Länderseite. Gesamtumfang und Tagesgrenze werden vor Phase 3 festgelegt, auch ob sie je Länderseite oder insgesamt gelten (`00_projekt_uebersicht.md`, offener Punkt 11).
 - **Realistisches Hauptrisiko:** vertraglich, also eine Sperrung des Accounts. Bei privater Nutzung ohne Weitergabe ist kein Strafrisiko erkennbar.
 
 ---
 
-## 6. Entscheidungen (Verlauf)
+## 6. Grundsatzentscheidungen
+
+Den vollständigen Verlauf mit Datum und Begründung enthält `08_entscheidungsprotokoll.md`.
 
 | Entscheidung | Begründung |
 |---|---|
@@ -140,10 +156,11 @@ Laut Nutzer umfasst die Abklärung auch die Weitergabe **bereinigter, vom Nutzer
 | Gästebuch-Tenor gestrichen | Entscheidung des Nutzers (01.11.2026): nur die Anzahl ist relevant; laut Nutzer gibt der Host Einträge zur Veröffentlichung frei |
 | Jeder Hof wird nur einmal erfasst, keine erneuten Abrufe | Entscheidung des Nutzers (01.11.2026); Datensparsamkeit, weniger Seitenaufrufe |
 | Freie Zeitfenster aus dem Kalender werden erfasst, falls technisch gut möglich | Entscheidung des Nutzers (01.11.2026); Zeitfenster sind laut Datenregeln für Claude erlaubt |
-| Beschreibungen gehen nur bereinigt und vom Nutzer freigegeben an Claude; laut Nutzer von der Abklärung mit WWOOF umfasst (01.11.2026) | Regel „keine Personendaten an KI-Dienste“; Beschreibungen enthalten oft Namen; die CWP-Datenschutzerklärung nennt die Beschreibung als möglicherweise identifizierend |
+| Aus Beschreibungen gehen nur Stichwort-Kategorien und ein Steckbrief (Werte aus festem Schema, kein Freitext) an Claude; ersetzt am 17.11.2026 die Bereinigung mit Freigabe jeder Beschreibung | Regel „keine Personendaten an KI-Dienste“; die CWP-Datenschutzerklärung nennt die Beschreibung als möglicherweise identifizierend. Die Positivliste schließt Namen durch den Aufbau aus, ohne Prüfung von Hand |
+| Struktur-Skelette echter Seiten dürfen nach Prüfung durch den Nutzer an Claude (17.11.2026) | Alle Texte und Attributwerte sind ersetzt; es bleibt nur der Aufbau. Gesicherte Seiten und HTML-Quelltext bleiben lokal |
 | Keine Web-Recherche zu einzelnen Höfen durch Claude | Gefahr, auf Personendaten zu stoßen |
 | Löschung aller Hofdaten nach der Reise; darum kümmert sich der Nutzer, auch um hochgeladene Exporte | Zusage aus der Anfrage an WWOOF |
-| Stichwort-Umwandlung lokal und regelbasiert | Kategorien strukturieren die Bewertung; für nicht freigegebene Beschreibungen sind sie die einzige Beschreibungsinformation für Claude |
+| Stichwort-Umwandlung und Steckbrief lokal und regelbasiert | KI-frei; die Ergebnisse sind die einzige Beschreibungsinformation für Claude |
 
 ---
 

@@ -10,10 +10,12 @@ Privates Lern- und Planungsprojekt: KI-freie Python-Skripte („Hof-Sammler“),
   - `docs/00_projekt_uebersicht.md`: Überblick, Datenfluss, offene Punkte
   - `docs/02_regeln_und_rahmenbedingungen.md`: Absprachen mit WWOOF, Datenregeln
   - `docs/04_technische_voraussetzungen.md`: Einrichtung des Laptops
-  - `docs/05_stichwort_taxonomie.md`: Taxonomie für Phase 6
+  - `docs/05_stichwort_taxonomie.md`: Taxonomie und Steckbrief (Phase 5)
   - `docs/07_bedienung.md`: Bedienung des Sammlers, Checkliste „Neue Länderseite“
+  - `docs/08_entscheidungsprotokoll.md`: Verlauf aller Entscheidungen; neue Entscheidungen trägst du dort ein
   - `docs/arbeiten_mit_claude_code.md`: Anleitung für den Nutzer
-- Bei Widersprüchen gilt diese Datei vor `docs/06_fortschritt.md` und dieses vor den übrigen Dokumenten; innerhalb des Fortschritts gilt die neuere Entscheidung. Melde Widersprüche dem Nutzer.
+- Jedes Thema steht an genau einer Stelle (Tabelle in `docs/00_projekt_uebersicht.md`); andere Dokumente verweisen nur. Schreibe nichts doppelt.
+- Bei Widersprüchen gilt diese Datei vor `docs/06_fortschritt.md` und dieses vor den übrigen Dokumenten; im Protokoll gilt die neuere Entscheidung. Melde Widersprüche dem Nutzer.
 - Die Reiseplanung läuft außerhalb dieses Repositorys im claude.ai-Projekt.
 
 ## Arbeitsweise (Entscheidung vom 15.11.2026)
@@ -23,7 +25,7 @@ Der Nutzer steuert, prüft und lernt. Du schreibst den Code und erklärst ihn. A
 1. **Vorschlagen:** Beschreibe den nächsten Schritt: Ziel, betroffene Dateien, Vorgehen und Abnahmekriterium (woran wir sehen, dass es funktioniert). Warte auf das OK des Nutzers.
 2. **Umsetzen:** Fasse sinnvoll zusammenhängende Arbeit zu einem Schritt zusammen. Nicht zu kleinteilig; im Zweifel lieber etwas mehr auf einmal. Prüfe das Ergebnis selbst mit erfundenen Testdaten (ab Phase 2 mit `python -m pytest`).
 3. **Erklären:** Pro geänderter Datei kurz, was sich geändert hat und warum. Neue Konzepte (Python, Tests, Git, HTML/CSS, Playwright) erklärst du in wenigen Sätzen und verweist auf die Stelle im Code. Der Nutzer hat Python-Grundkenntnisse.
-4. **Dokumentieren:** Aktualisiere `docs/06_fortschritt.md` (Status, Entscheidungen, Funde) im selben Schritt, und `docs/07_bedienung.md`, wenn sich die Bedienung ändert.
+4. **Dokumentieren:** Aktualisiere im selben Schritt `docs/06_fortschritt.md` (Stand, Schrittplan; kurz halten), `docs/08_entscheidungsprotokoll.md` (Entscheidungen, Funde) und `docs/07_bedienung.md`, wenn sich die Bedienung ändert.
 5. **Commit vorschlagen:** Zeige `git status`, nenne die Dateien und eine Commit-Nachricht. Nach dem OK: `git add` mit einzelnen Dateinamen (nie `git add .` oder `git add -A`), dann `git commit`. **Pushen tut nur der Nutzer.**
 6. **Anhalten:** Beginne den nächsten Schritt erst auf ausdrücklichen Auftrag.
 
@@ -43,8 +45,8 @@ Weitere Regeln:
 Diese Regeln gelten immer, auch wenn ein Auftrag etwas anderes nahelegt. Im Zweifel fragst du nach.
 
 1. **Kein Zugriff auf den Datenordner `../wwoof-data/`:** nicht lesen, nicht auflisten, nicht durchsuchen, keine Befehle mit Pfaden dorthin, nicht danach fragen. Echte Hofdaten gibt es nur dort.
-2. **Nur mit erfundenen Daten ausführen:** Du startest nur Code, der ausschließlich mit Daten aus `tests/` oder selbst erzeugten erfundenen Daten arbeitet, z. B. `python -m pytest` oder `python -m src.<modul>` mit Pfaden zu Testdaten. Nie Skripte, die `config.yaml` mit dem echten `data_dir` laden oder echte Daten verarbeiten (Sammler, Stichworte, Bereinigung, Export). Diese Läufe startet nur der Nutzer, in einem eigenen Terminal.
-3. **Kein Zugriff auf Länderseiten der CWP (z. B. wwoof.de, wwoofnorway.org) oder api.wwoof.net**, weder per Web-Abruf noch per Browser noch per Skript. Für Übungen nur toscrape.com (Phase 3). Keine Web-Recherche zu einzelnen Höfen.
+2. **Nur mit erfundenen Daten ausführen:** Du startest nur Code, der ausschließlich mit Daten aus `tests/` oder selbst erzeugten erfundenen Daten arbeitet, z. B. `python -m pytest` oder `python -m src.<modul>` mit Pfaden zu Testdaten. Nie Skripte, die `config.yaml` mit dem echten `data_dir` laden, den echten Datenordner verwenden oder echte Daten verarbeiten (Erkundung, Sammler, Stichworte und Steckbrief, Export). Diese Läufe startet nur der Nutzer, in einem eigenen Terminal.
+3. **Kein Zugriff auf Länderseiten der CWP (z. B. wwoof.de, wwoofnorway.org) oder api.wwoof.net**, weder per Web-Abruf noch per Browser noch per Skript. Browser-Skripte testest du nur auf toscrape.com, mit Ausgaben nach `out/`. Keine Web-Recherche zu einzelnen Höfen.
 4. **Leitplanken im Code** (`docs/03_programmierprojekt.md`, Abschnitt 2) immer umsetzen:
    - KI-frei; eine Länderseite und eine Region pro Lauf
    - Obergrenze pro Lauf (Vorschlag 30; harte Grenze 50 fest im Code, nicht konfigurierbar)
@@ -52,15 +54,15 @@ Diese Regeln gelten immer, auch wenn ein Auftrag etwas anderes nahelegt. Im Zwei
    - robots.txt vor jedem Lauf prüfen
    - bei Captcha, Zugriffsverweigerung, Login-Aufforderung oder unerwarteten Fehlern sauber beenden statt wiederholen
    - jeder Hof wird nur einmal erfasst; vom Gästebuch nur die Anzahl
-5. **Keine Hofdaten in Ausgaben:** Logs, Zusammenfassungen und Fehlermeldungen enthalten nur Hof-Codes, Zahlen und Status. Selektoren über die Struktur bauen, nicht über sichtbare Texte; in Doku und Chat Platzhalter wie `<FARM_NAME>` verwenden.
-6. **Nutzerdateien nie überschreiben:** Dateien und Spalten, die der Nutzer pflegt (`notes.csv`, `name_list.txt`, Freigaben und Korrekturen in `sanitization.csv`), schreibt kein Skript.
+5. **Keine Hofdaten in Ausgaben:** Logs, Zusammenfassungen und Fehlermeldungen enthalten nur Hof-Codes, site_id, Zahlen und Status. Nach außen gehen aus Beschreibungen nur Kategorien und Steckbrief-Werte aus festem Schema, nie Freitext. Selektoren über die Struktur bauen, nicht über sichtbare Texte; in Doku und Chat Platzhalter wie `<FARM_NAME>` verwenden.
+6. **Nutzerdateien nie überschreiben:** `notes.csv` pflegt nur der Nutzer; kein Skript schreibt sie.
 7. **Testdaten nur erfunden:** reservierte Domains (`example.com`, `example.org`), Rufnummern für Medienproduktionen der Bundesnetzagentur, erkennbare Platzhalternamen, erfundene Orte.
-8. **Versehentlich geteilte Hofdaten** (Namen, Links, Texte aus Profilen): darauf hinweisen, nicht verwenden, nicht wiederholen.
+8. **Versehentlich geteilte Hofdaten** (Namen, Links, Texte aus Profilen): darauf hinweisen, nicht verwenden, nicht wiederholen. Struktur-Skelette aus echten Seiten nimmst du nur an, wenn der Nutzer sie geprüft hat; enthält eines trotzdem lesbare Inhalte, gilt dieselbe Regel.
 9. **Umfang nur CWP:** eine Codebasis für Länderseiten der CWP; kein Code und keine Vorbereitung für andere Plattformen (z. B. wwoof.ie). Länderdaten stehen in `sites/<site_id>.yaml`; außerhalb von `sites/` und `tests/fixtures/` steht keine Domain einer Länderseite im Code. Tests verwenden nur erfundene Länderseiten-Dateien aus `tests/fixtures/`.
 
 ## Konventionen
 
-- Code komplett englisch: Bezeichner, Kommentare, Datei-, Ordner- und Spaltennamen, Programmausgaben. Suchbegriffe (Taxonomie, Verneinungen, Bereinigung) bleiben in ihrer Sprache, nach Sprache getrennt. Dokumentation deutsch.
+- Code komplett englisch: Bezeichner, Kommentare, Datei-, Ordner- und Spaltennamen, Programmausgaben. Suchbegriffe (Taxonomie, Verneinungen, Steckbrief-Regeln) bleiben in ihrer Sprache, nach Sprache getrennt. Dokumentation deutsch.
 - YAML: Codes (Länder-, Sprach-, Regionskürzel) immer in Anführungszeichen; ein `no` ohne Anführungszeichen liest YAML als `false`.
 - CSV: Trennzeichen `;`, Kodierung `utf-8-sig`, Listen in Feldern mit `|`. Bestätigt in Phase 1, Schritt 8; Speicherregel und Datumsregel in `docs/03_programmierprojekt.md`, Abschnitt 5.5.
 - Laufzeitprüfungen lösen eigene Exceptions aus, kein `assert` (außer in Tests).

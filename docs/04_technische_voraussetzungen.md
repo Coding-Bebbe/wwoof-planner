@@ -1,6 +1,6 @@
 # Technische Voraussetzungen: Laptop einrichten (Windows)
 
-**Stand:** 06.11.2026 (Phase 0 abgeschlossen), ergänzt am 15.11.2026 (Abschnitt 8: Arbeitsweise mit Claude Code) und am 17.11.2026 (Länderseiten der CWP: Abschnitte 1, 3, 8). Die Versionsangaben zu Python wurden am 31.10.2026 geprüft; bei späterer Einrichtung die aktuellen Hinweise auf python.org beachten.
+**Stand:** 17.11.2026 (Phase 0 abgeschlossen am 06.11.2026). Die Versionsangaben zu Python wurden am 31.10.2026 geprüft; bei späterer Einrichtung die aktuellen Hinweise auf python.org beachten.
 
 **Gerät des Nutzers:** privater Windows-Laptop (Surface Pro 8). Diese Anleitung beschreibt deshalb nur Windows. Alle Befehle laufen in der **PowerShell**.
 
@@ -25,7 +25,7 @@
 | **Git** (Git for Windows) | Versionsverwaltung | **Pflicht**; bringt den Git Credential Manager für die Anmeldung bei GitHub mit |
 | **GitHub-Konto** | privates Repository | **Pflicht** |
 | **Claude Code** (lokal) | schreibt seit dem 15.11.2026 den Code | Einrichtung und Absicherung in Abschnitt 8 |
-| WWOOF-Mitgliedschaft je Länderseite | Zugang zu Hofprofilen | Deutschland aktiv (01.11.2026), ab Phase 4 nötig; jede weitere Länderseite braucht eine eigene (`07_bedienung.md`, Teil C) |
+| WWOOF-Mitgliedschaft je Länderseite | Zugang zu Hofprofilen | Deutschland aktiv (01.11.2026), ab Phase 2 nötig; jede weitere Länderseite braucht eine eigene (`07_bedienung.md`, Teil C) |
 
 ---
 
@@ -170,7 +170,7 @@ git config --global init.defaultBranch main
 ### 7.4 Privates Repository anlegen und verbinden
 
 1. Auf GitHub ein neues Repository `wwoof-planner` anlegen: Sichtbarkeit **Private**, **ohne** README, `.gitignore` und Lizenz. So klappt der erste Push ohne Konflikt.
-2. Im Code-Ordner die Datei `.gitignore` mit dem Inhalt aus `03_programmierprojekt.md`, Abschnitt 10, anlegen (inklusive `.venv/`).
+2. Im Code-Ordner die Datei `.gitignore` anlegen (inklusive `.venv/` und der Datenordner; aktueller Inhalt: Datei `.gitignore` im Repository).
 3. Repository anlegen, prüfen und hochladen:
 
 ```powershell
@@ -236,7 +236,7 @@ Stand 06.11.2026: alle Punkte laut Nutzer erfüllt.
 - [x] Git installiert und eingerichtet (Name, noreply-Adresse, Standardzweig `main`)
 - [x] Privates GitHub-Repository `wwoof-planner` angelegt, `.gitignore` vorhanden, erster Commit hochgeladen
 - [x] Claude Code installiert, Read-Deny-Regel für `wwoof-data` angelegt und getestet: Ein Leseversuch auf eine Testdatei im Datenordner wird abgelehnt (offener Punkt 9)
-- [x] WWOOF-Deutschland-Mitgliedschaft aktiv (01.11.2026); Vollständigkeit des Profils prüfst du in Phase 4
+- [x] WWOOF-Deutschland-Mitgliedschaft aktiv (01.11.2026); Vollständigkeit des Profils prüfst du in Phase 2
 
 ---
 

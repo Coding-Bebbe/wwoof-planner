@@ -20,8 +20,9 @@ Den Code schreibt Claude Code schrittweise; der Nutzer prüft, lässt sich erkl�
 
 - `CLAUDE.md`: Regeln für Claude Code (Arbeitsweise, Daten- und Plattformregeln)
 - `docs/arbeiten_mit_claude_code.md`: Anleitung für die Zusammenarbeit
-- `docs/06_fortschritt.md`: aktueller Stand, Schrittplan und Entscheidungen
+- `docs/06_fortschritt.md`: aktueller Stand und Schrittplan
 - `docs/07_bedienung.md`: Bedienung des Sammlers, Checkliste für eine neue Länderseite
+- `docs/08_entscheidungsprotokoll.md`: Verlauf aller Entscheidungen
 
 ## Ausführen
 
@@ -39,9 +40,8 @@ Alle Skripte arbeiten mit den erfundenen Testdaten in `tests/fixtures/`.
 
 - [x] Phase 0 – Einrichtung
 - [x] Phase 1 – Python-Grundlagen, Testdaten, CSV-Format
-- [ ] Phase 2 – Konfiguration mit Länderseiten-Datei, robots.txt, pytest
-- [ ] Phase 3 – HTML/CSS, Playwright auf Übungsseiten
-- [ ] Phase 4 – wwoof.de erkunden (erste Länder-Prüfung)
-- [ ] Phase 5 – Hof-Sammler
-- [ ] Phase 6 – Stichworte und Bereinigung
-- [ ] Phase 7 – Export
+- [ ] Phase 2 – Länderseite erkunden (pytest, robots.txt, Erkundungsskript, erste Länder-Prüfung)
+- [ ] Phase 3 – Hof-Sammler
+- [ ] Phase 4 – Erster Export (schlank)
+- [ ] Phase 5 – Stichworte und Steckbrief
+- [ ] Phase 6 – Vollständiger Export

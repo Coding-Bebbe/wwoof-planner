@@ -79,7 +79,7 @@ def find_duplicate_profile_urls(farms: list[dict[str, str]]) -> list[list[str]]:
     The result contains farm codes only, no URLs, so that it can be
     printed without farm data (hard rule 5 in CLAUDE.md).
     URLs are compared exactly as stored; how to normalise them is
-    decided in phase 4.
+    decided in phase 2.
     """
     codes_by_url: dict[str, list[str]] = {}
     for farm in farms:

@@ -1,10 +1,10 @@
 # Stichwort-Taxonomie (Entwurf, Version 1)
 
-**Stand:** 01.11.2026, ergänzt am 17.11.2026 (Abschnitt 5: Sprachen und Länderseiten)
+**Stand:** 17.11.2026
 
-Diese Taxonomie ordnet Begriffe aus Hofbeschreibungen Kategorien zu. Das Skript `tagging.py` wendet sie **lokal und KI-frei** an (siehe `03_programmierprojekt.md`, Abschnitt 6). Die **Kategorieschlüssel** (z. B. `vegetables`) gehen in den Export für Claude. Den Text selbst bekommt Claude nur als bereinigte, von dir freigegebene Fassung (siehe `03_programmierprojekt.md`, Abschnitt 7). Für Beschreibungen, die du nicht freigegeben hast, sind die Kategorien die einzige Information aus dem Text, die Claude erhält.
+Diese Taxonomie ordnet Begriffe aus Hofbeschreibungen Kategorien zu. Das Skript `tagging.py` wendet sie **lokal und KI-frei** an (siehe `03_programmierprojekt.md`, Abschnitt 6). Die **Kategorieschlüssel** (z. B. `vegetables`) gehen in den Export für Claude, zusammen mit dem Steckbrief (Abschnitt 6 hier, `03_programmierprojekt.md`, Abschnitt 7). Den Beschreibungstext selbst bekommt Claude nie.
 
-Der Entwurf ist ein Startpunkt. In Phase 6 schärfst du ihn anhand der nicht abgedeckten Sätze nach.
+Der Entwurf ist ein Startpunkt. In Phase 5 schärfst du ihn per Stichprobe anhand der nicht abgedeckten Sätze nach.
 
 **Sprache (Entscheidung vom 01.11.2026):** Schlüssel und Strukturbegriffe der YAML-Datei sind englisch, weil sie Teil des Codes sind. Die Suchbegriffe bleiben deutsch und englisch, so wie sie in Profilen vorkommen. Die `label`-Texte bleiben deutsch, weil sie nur Anzeigetexte für dich sind. Seit dem 17.11.2026 werden die Suchbegriffe nach Sprache getrennt (Abschnitt 5).
 
@@ -53,7 +53,7 @@ Die Hinweis-Kategorien dienen später der Bewertung: Laut der Charta von WWOOF B
 
 ## 3. Taxonomie (YAML)
 
-Diesen Block übernimmst du in Phase 6 als `taxonomy.yaml`.
+Diesen Block übernimmst du in Phase 5 als `taxonomy.yaml`.
 
 ```yaml
 version: 1
@@ -296,7 +296,7 @@ groups:
 - **Trennbare Verben:** Im Deutschen stehen Verbteile oft weit auseinander („wir holen dich am Bahnhof ab“). Für „abholen“ gibt es dafür eine Regex-Regel; bei anderen Verben fallen solche Fälle erst bei Stichproben auf und werden dann ergänzt.
 - **Ortsnamen:** Begriffe wie „berg“ können in Ortsnamen stecken. „berg“ steht deshalb nur unter `whole_word`; Ortsnamen wie „Bamberg“ treffen dann nicht.
 - **Andere Sprachen:** Deutsch und Englisch sind abgedeckt. Weitere Sprachen (z. B. Norwegisch) kommen über die Checkliste „Neue Länderseite“ dazu (`07_bedienung.md`, Teil C); siehe Abschnitt 5.
-- **Lernkategorien der Plattform** stehen nicht in dieser Taxonomie. Sie werden in der Länder-Prüfung (für Deutschland Phase 4) als feste Liste gesammelt und in der Länderseiten-Datei gespeichert (`learning_categories` in `sites/<site_id>.yaml`).
+- **Lernkategorien der Plattform** stehen nicht in dieser Taxonomie. Sie werden in der Länder-Prüfung (für Deutschland Phase 2) als feste Liste gesammelt und in der Länderseiten-Datei gespeichert (`learning_categories` in `sites/<site_id>.yaml`).
 
 ---
 
@@ -311,4 +311,15 @@ Der Hof-Sammler kann jede Länderseite der Common WWOOF Platform erfassen. Besch
 5. **Fehlende Sprachdaten:** Steht in `languages` einer Länderseite eine Sprache, für die die Taxonomie keine Begriffe enthält, bricht die Stichwort-Erkennung für die betroffenen Höfe mit klarer Meldung ab. Die Meldung nennt nur Hof-Code, site_id und Sprachcode.
 6. **Normalisierung:** Die Vereinheitlichung aus Abschnitt 1 (ä→ae, ö→oe, ü→ue, ß→ss) ist auf Deutsch zugeschnitten. Für andere Sprachen (z. B. æ, ø, å im Norwegischen) werden die Regeln bei der Länder-Prüfung festgelegt.
 7. **YAML-Falle:** Sprachcodes stehen immer in Anführungszeichen; ein `no` ohne Anführungszeichen (Norwegisch) liest YAML als `false`.
-8. **Umstellung:** Der YAML-Block in Abschnitt 3 bleibt bis Phase 6 der gemischte Entwurf (deutsch und englisch). In Phase 6, Teil A, wird er beim Übernehmen nach `taxonomy.yaml` nach Sprache umgestellt; das genaue Format legen wir dann fest.
+8. **Umstellung:** Der YAML-Block in Abschnitt 3 bleibt bis Phase 5 der gemischte Entwurf (deutsch und englisch). In Phase 5 wird er beim Übernehmen nach `taxonomy.yaml` nach Sprache umgestellt; das genaue Format legen wir dann fest.
+
+---
+
+## 6. Steckbrief (Entscheidung vom 17.11.2026; Schema folgt in Phase 5)
+
+Neben den Kategorien formt `tagging.py` jede Beschreibung in einen **Steckbrief** um. Er ersetzt die frühere Bereinigung mit Freigabe (Begründung in `03_programmierprojekt.md`, Abschnitt 7).
+
+1. **Nur Schema-Werte:** Der Steckbrief besteht aus `key=value`-Paaren eines festen Schemas, z. B. `accommodation=caravan`, `pickup=yes`, `work_hours_per_day=5`, `station_walk_minutes=10`. Werte sind feste Begriffe, Zahlen oder Wahrheitswerte, nie Text aus der Beschreibung.
+2. **Regeln je Sprache:** Wie die Suchbegriffe (Abschnitt 5) stehen die Regeln zum Auslesen je Sprache, meist als reguläre Ausdrücke mit Zahl, z. B. für „10 Minuten zu Fuß vom Bahnhof“ oder „5 Stunden am Tag“.
+3. **Schema aus dem Bedarf:** Welche Schlüssel es gibt, leiten wir aus deinen Auswahlkriterien (offener Punkt 3) und der Rückmeldung zur Attrappe (Phase 2) ab. Kandidaten aus dieser Taxonomie: Unterkunftsart, Abholung, Erreichbarkeit mit ÖPNV, Sprache; dazu Zahlen wie Arbeitsstunden, Arbeitstage oder Entfernungen.
+4. **Prüfung:** Der Bericht zeigt Kategorien und Steckbrief je Hof; du prüfst per Stichprobe. Der Export-Selbsttest lässt nur Schlüssel und Werte aus dem Schema durch.
