@@ -1,6 +1,6 @@
 # wwoof-planner
 
-Privates Lern- und Planungsprojekt: KI-freie Python-Skripte, die Hofinformationen für eine WWOOF-Reise lokal erfassen und aufbereiten.
+Privates Lern- und Planungsprojekt: KI-freie Python-Skripte, die Hofinformationen für eine WWOOF-Reise lokal erfassen und aufbereiten. Der Hof-Sammler ist für die Länderseiten der Common WWOOF Platform (CWP) gebaut, zuerst Deutschland; die Länderseite wird in der Konfiguration gewählt.
 
 **Dieses Repository enthält keine echten Hofdaten.** Echte Daten liegen außerhalb des Repositorys. Die Testdaten in `tests/fixtures/` sind vollständig erfunden.
 
@@ -9,6 +9,7 @@ Privates Lern- und Planungsprojekt: KI-freie Python-Skripte, die Hofinformatione
 | Ordner | Inhalt |
 |---|---|
 | `src/` | Python-Code |
+| `sites/` | eine Datei pro Länderseite, z. B. `de.yaml` (ab Phase 2) |
 | `tests/fixtures/` | erfundene Testdaten |
 | `out/` | Ausgaben aus Testläufen (nicht in Git) |
 | `docs/` | Projektdokumentation: Plan, Regeln, Fortschritt |
@@ -20,6 +21,7 @@ Den Code schreibt Claude Code schrittweise; der Nutzer prüft, lässt sich erkl�
 - `CLAUDE.md`: Regeln für Claude Code (Arbeitsweise, Daten- und Plattformregeln)
 - `docs/arbeiten_mit_claude_code.md`: Anleitung für die Zusammenarbeit
 - `docs/06_fortschritt.md`: aktueller Stand, Schrittplan und Entscheidungen
+- `docs/07_bedienung.md`: Bedienung des Sammlers, Checkliste für eine neue Länderseite
 
 ## Ausführen
 
@@ -37,9 +39,9 @@ Alle Skripte arbeiten mit den erfundenen Testdaten in `tests/fixtures/`.
 
 - [x] Phase 0 – Einrichtung
 - [x] Phase 1 – Python-Grundlagen, Testdaten, CSV-Format
-- [ ] Phase 2 – Konfiguration, robots.txt, pytest
+- [ ] Phase 2 – Konfiguration mit Länderseiten-Datei, robots.txt, pytest
 - [ ] Phase 3 – HTML/CSS, Playwright auf Übungsseiten
-- [ ] Phase 4 – wwoof.de erkunden
+- [ ] Phase 4 – wwoof.de erkunden (erste Länder-Prüfung)
 - [ ] Phase 5 – Hof-Sammler
 - [ ] Phase 6 – Stichworte und Bereinigung
 - [ ] Phase 7 – Export

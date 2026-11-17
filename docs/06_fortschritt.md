@@ -11,7 +11,8 @@
 - **Umstellung am 15.11.2026:** Claude Code schreibt den Code schrittweise, der Nutzer prüft, lässt sich erklären und pusht selbst. Regeln in `CLAUDE.md`, Entscheidungen in Abschnitt 6 (15.11.2026), Anleitung in `docs/arbeiten_mit_claude_code.md`.
 - **Schritt 0 (Umstellung) umgesetzt am 15.11.2026**; Commit `Set up Claude Code workflow`, Push durch den Nutzer.
 - **Außerhalb des Schrittplans:** Die lokale Änderung an `src/filter_region.py` vom 11.11.2026 (Kommentare) hat der Nutzer behalten; eigener Commit `Phase 1: tidy comments in filter_region`.
-- **Nächster Schritt:** Phase 2 (Konfiguration, robots.txt, pytest, GitHub Actions); Claude Code schlägt den ersten Schritt nach `docs/03_programmierprojekt.md`, Phase 2, vor.
+- **Grundsatzentscheidung vom 17.11.2026:** Der Hof-Sammler soll jede Länderseite der Common WWOOF Platform (CWP) erfassen können; die Länderseite wird in der Konfiguration gewählt. In alle Dokumente eingearbeitet (Abschnitt 6, 17.11.2026); neue Bedienungsanleitung `docs/07_bedienung.md`. Code ist nicht betroffen. Commit `Docs: support CWP country sites`.
+- **Nächster Schritt:** Phase 2 nach dem angepassten Plan (Konfiguration mit Länderseiten-Datei, robots.txt, pytest, GitHub Actions, `docs/07_bedienung.md` Teil A); Claude Code schlägt den ersten Schritt nach `docs/03_programmierprojekt.md`, Phase 2, vor.
 
 ---
 
@@ -24,6 +25,7 @@
 | Vorkenntnisse | Python-Grundlagen, Terminal; HTML/CSS neu |
 | Zeitplan | keiner; der Nutzer arbeitet nach eigenem Tempo (15.11.2026) |
 | Reiseplanung | im claude.ai-Projekt (`01_reiseplan.md`); Planungsgrundlage für den Reisebeginn ist Juni 2027 |
+| Länderseiten | Deutschland (wwoof.de, site_id `de`): Mitgliedschaft aktiv; Phase 4 ist die Länder-Prüfung. Norwegen (wwoofnorway.org): nächster Kandidat über `docs/07_bedienung.md`, Teil C; noch nichts erledigt. Irland (wwoof.ie): außerhalb des Umfangs (17.11.2026) |
 
 ---
 
@@ -33,9 +35,9 @@
 |---|---|---|
 | 0 | Einrichtung, Git und GitHub, Ordnertrennung, Claude Code mit Sperre des Datenordners | erledigt (06.11.2026) |
 | 1 | Python-Grundlagen, erfundene Testdaten, CSV-Format | erledigt (17.11.2026) |
-| 2 | Konfiguration, robots.txt, pytest, GitHub Actions | offen |
+| 2 | Konfiguration mit Länderseiten-Datei, robots.txt, pytest, GitHub Actions, Bedienung Teil A | offen |
 | 3 | HTML/CSS-Grundlagen, Playwright auf Übungsseiten | offen |
-| 4 | wwoof.de erkunden (Gate erfüllt) | offen |
+| 4 | wwoof.de erkunden, erste Länder-Prüfung (Gate erfüllt) | offen |
 | 5 | Hof-Sammler bauen, erste Region erfassen | offen |
 | 6 | Stichworte (Teil A), Bereinigung und Freigabe der Beschreibungen (Teil B) | offen |
 | 7 | Export mit freigegebenen Beschreibungen | offen |
@@ -90,12 +92,19 @@ Seit 15.11.2026 schreibt Claude Code den Code; der Nutzer prüft. Den Test mit E
 
 | Phase | Punkt | Herkunft |
 |---|---|---|
-| 2 | Regionswerte aus `config.yaml` und Tabelle müssen exakt übereinstimmen (Groß- und Kleinschreibung); Warnung bei 0 Treffern erwägen | Schritt 4, 08.11.2026 |
+| 2 | Regionswerte aus `config.yaml` und Tabelle müssen exakt übereinstimmen (Groß- und Kleinschreibung); Warnung bei 0 Treffern erwägen. Teilweise abgedeckt durch die Prüfung in `config.py`: Region muss in der Länderseiten-Datei stehen, Regionsschlüssel sind klein (17.11.2026) | Schritt 4, 08.11.2026 |
 | 2 | Tests laufen bei jedem Push automatisch auf GitHub (GitHub Actions) | Entscheidung vom 15.11.2026 |
-| 4 | Prüfen, ob eine Lernkategorie der Plattform das Zeichen `\|` enthält; sonst würde `split_list` sie zerlegen | 15.11.2026 |
-| 4 | Regel für die Normalisierung von `profile_url` festlegen und in `find_duplicate_profile_urls` übernehmen (bis dahin exakter Vergleich) | Schritt 6, 15.11.2026 |
+| 2 | `config.py` lädt `config.yaml` und `sites/<site>.yaml` mit den Prüfungen aus `docs/03_programmierprojekt.md`, Abschnitt 5.4; Region ohne Suchdefinition und leere `learning_categories` sind zulässig. `robots_check.py` liest `base_url` aus der Länderseiten-Datei. `sites/de.yaml` (Regionen nur mit Schlüssel und Kürzel). Tests mit erfundenen Länderseiten (z. B. `zz`), darunter `site: no` ohne Anführungszeichen. `docs/07_bedienung.md`, Teil A | Entscheidung vom 17.11.2026 |
+| 2 | Genaue `base_url` für Deutschland (mit oder ohne `www`) prüft der Nutzer im Browser; Claude Code ruft die Seite nicht auf | 17.11.2026 |
+| 4 | Phase 4 ist die erste Länder-Prüfung: festhalten, was plattformweit und was länderspezifisch ist; Stelle im Code für das Plattformweite festlegen; Suchdefinitionen und `learning_categories` in `sites/de.yaml`; Vorgehen für den Testlauf mit einem Profil festlegen; `docs/07_bedienung.md`, Teil C, schärfen | Entscheidung vom 17.11.2026 |
+| 4 | Prüfen, ob eine Lernkategorie der Plattform das Zeichen `\|` enthält; sonst würde `split_list` sie zerlegen. Seit 17.11.2026 je Länderseite (Teil der Länder-Prüfung) | 15.11.2026 |
+| 4 | Regel für die Normalisierung von `profile_url` festlegen und in `find_duplicate_profile_urls` übernehmen (bis dahin exakter Vergleich). Die normalisierte URL behält die Domain (17.11.2026) | Schritt 6, 15.11.2026 |
 | 5 | Der Sammler löst einen Fehler aus, wenn ein Listenwert das Trennzeichen enthält, statt ihn falsch zu speichern | Vorschlag von Claude, 15.11.2026 (Einspruch möglich) |
+| 5 | Sammler mit `site` und `region`; Browser-Profil `browser_profile/<site_id>/`; Abbruch vor dem ersten Seitenaufruf, wenn die Region keine Suchdefinition hat (mit Test); Link-Listen und Log-Einträge mit site_id; `docs/07_bedienung.md`, Teil A, vollständig | Entscheidung vom 17.11.2026 |
 | 6 | Datumsspalten in `sanitization.csv` (`reviewed_on`) in beiden Formaten lesen (`JJJJ-MM-TT` und `TT.MM.JJJJ`), weil Excel beim Speichern umwandelt; andere Formate mit klarer Meldung ablehnen | Schritt 8, 17.11.2026 |
+| 6 | Taxonomie nach Sprache umstellen (`docs/05_stichwort_taxonomie.md`, Abschnitt 5); Formulierungen der Bereinigung je Sprache, Muster für Postleitzahlen und Telefonnummern je Land; Ablage dieser Daten festlegen; Abbruch für betroffene Höfe, wenn Daten fehlen; `docs/07_bedienung.md`, Teil B | Entscheidung vom 17.11.2026 |
+| 7 | Export-Selbsttest zusätzlich: Länderteil jedes Hof-Codes gehört zu einer bekannten Länderseite, deren Sprach- und Länderdaten vorhanden sind; `learning_categories` gegen die Liste der Länderseite des Hofs (leere Liste wird abgelehnt) | Entscheidung vom 17.11.2026 |
+| Teil C | Bei jeder weiteren Länderseite: Regel für erfundene Rufnummern des Landes in Testdaten (die Regel der Bundesnetzagentur gilt nur für Deutschland); Normalisierung für die Sprache (z. B. æ, ø, å); Sprachcode für Norwegisch (`no` oder `nb`) | Vorschlag von Claude Code, 17.11.2026 |
 | alle | Dateinamen nicht aus Werten ableiten, die sich nur in der Schreibung unterscheiden (Windows) | Schritt 4, 08.11.2026 |
 
 ---
@@ -287,3 +296,51 @@ Derzeit keine. Die offenen Punkte zur Reise und zum Sammler stehen in `docs/00_p
 | Verständnisfragen | Fünf Fragen gestellt (Spaltenprüfung und `None` in `read_farms`, mehrzeilige Felder und `newline=""`, Fehlermeldungen ohne Werte, `keep_default_na`/`kind="stable"` in pandas, Byte-Prüfung in `table_roundtrip`). Laut Nutzer beantwortet | Die Antworten hat Claude Code nicht gesehen; besprochen wurden sie nicht. Damit ist auch die Wiederholung der Fragen vom 08.11.2026 nur vom Nutzer bestätigt. Der Nutzer hat den Abschluss ausdrücklich beauftragt. Nachbesprechung jederzeit möglich |
 | README | Phase 1 abgehakt; Startbefehle aller Skripte ergänzt | – |
 | Beobachtung | Ein Skript außerhalb des Repository-Ordners findet `src` nur mit `PYTHONPATH` auf das Repository | Gleiche Ursache wie beim ▷-Knopf (08.11.2026) |
+
+### 17.11.2026 – Grundsatzentscheidung: alle Länderseiten der CWP (Claude Code und Nutzer)
+
+**Vorgaben des Nutzers**
+
+| Thema | Entscheidung |
+|---|---|
+| Umfang | Der Hof-Sammler soll jede Länderseite der Common WWOOF Platform (CWP) erfassen können, z. B. Deutschland (wwoof.de) und Norwegen (wwoofnorway.org). Die Länderseite wird über die Konfiguration gewählt, nicht durch Codeänderungen. Eine gemeinsame Codebasis, keine Abstraktionsschicht für mehrere Plattformen. Länderseiten außerhalb der CWP (z. B. Irland, wwoof.ie): kein Code, keine Vorbereitung. Aufbau einfach und nachvollziehbar |
+| Reihenfolge | Zuerst Deutschland. Weitere Länder nur über die Checkliste „Neue Länderseite“ (`docs/07_bedienung.md`, Teil C). Norwegen ist der nächste Kandidat |
+| Gleicher Aufbau | Nicht belegt, dass alle CWP-Länderseiten technisch gleich aufgebaut sind; der Nutzer prüft das bei jeder neuen Länderseite. Bei Abweichung wird dann entschieden; kein Mechanismus auf Vorrat |
+| Länderseiten-Datei | Eine Datei pro Länderseite: `sites/<site_id>.yaml`. site_id ist der Ländercode nach ISO 3166-1 Alpha-2 in Kleinbuchstaben, in Großbuchstaben zugleich der Länderteil des Hof-Codes. Inhalt (Entwurf; Phase 2 legt ihn fest): `base_url`, `languages`, `regions` (Schlüssel → Kürzel, Suchdefinition aus Phase 4), `learning_categories`. Nur Länderdaten; `config.py` lehnt unbekannte Schlüssel ab |
+| `config.yaml` | Wählt nur `site` und `region`. `farm_code_prefix` entfällt; das Präfix wird aus site_id und Regionskürzel gebildet (eine Quelle) |
+| Regionen | Regionsschlüssel klein und über alle Länderseiten eindeutig, weil die Spalte `region` in `farms.csv` kein Land enthält. Regionsschlüssel und -kürzel werden vor der robots-Prüfung festgelegt, die Suchdefinition erst nach der Länder-Prüfung (wie in Phase 4 für Deutschland). `config.py` lässt eine Region ohne Suchdefinition zu; der Sammler verlangt sie |
+| YAML-Falle | `no` ohne Anführungszeichen wird als `false` gelesen (Norwegen: site_id `"no"`). Codes stehen immer in Anführungszeichen; `config.py` lehnt Werte, die keine Strings sind, mit klarer Meldung ab; ein Test deckt `site: no` ab |
+| Plattformweit | Selektoren, URL-Normalisierung, Ablauf und Auslesen eines Profils gelten für die ganze CWP und stehen an genau einer Stelle im Code (festgelegt in Phase 4). Die normalisierte `profile_url` behält die Domain. Harte Grenzen, Pausen und Abbruchregeln gelten unverändert für jede Länderseite |
+| Sprach- und Länderdaten | Suchbegriffe der Taxonomie, Verneinungen, Ignorierliste und Formulierungen der Bereinigung nach Sprache getrennt; angewendet nur die Sprachen der Länderseite des Hofs (Länderteil des Hof-Codes). Grund: „sau“ (norwegisch Schaf, deutsch Schwein). Muster für Postleitzahlen und Telefonnummern je Land. Fehlen Daten, brechen Stichworte, Bereinigung und Export für die betroffenen Höfe mit klarer Meldung ab. Umstellung der Taxonomie in Phase 6, Teil A; Kategorienschlüssel bleiben sprachunabhängig |
+| Datenordner | `browser_profile/<site_id>/` je Länderseite (eigener Login, eigene Mitgliedschaft). `farms.csv` bleibt eine Tabelle für alle Länder, ohne Länderspalte. Erzeugte Dateinamen enthalten site_id und Regionsschlüssel in Kleinbuchstaben. Log-Einträge nennen die site_id, ohne Hofdaten |
+| Regeln | Alle Regeln, die wwoof.de nennen, gelten für jede CWP-Länderseite und für api.wwoof.net; nichts wird gelockert. Tests nur mit erfundenen Länderseiten-Dateien unter `tests/fixtures/`. Außerhalb von `sites/` und `tests/fixtures/` keine Domain einer Länderseite im Code |
+| Abklärung (Rückfrage vom 17.11.2026) | Die Abklärung vom 01.11.2026 war mit WWOOF Deutschland und mit dem Plattformbetreiber (FoWO/CWP). Sie gilt laut Nutzer für alle Länderseiten der CWP und wird einmal in `docs/02_regeln_und_rahmenbedingungen.md`, Abschnitt 1, festgehalten. Der im ersten Entwurf vorgesehene Schalter `agreement_confirmed` je Länderseiten-Datei **entfällt** |
+| Vor dem ersten Lauf (Rückfrage vom 17.11.2026) | Checkliste je Länderseite: Mitgliedschaft → Regionsschlüssel und -kürzel → robots-Prüfung → Länder-Prüfung → Suchdefinition → Testlauf mit einem Profil → erster Lauf. Im Code bleibt die robots-Prüfung vor jedem Lauf (dazu der Abbruch ohne Suchdefinition); Mitgliedschaft, Länder-Prüfung und Testlauf sichert die Checkliste ab |
+| Dokumentation | Neue Datei `docs/07_bedienung.md` (Teile A–E), wächst mit den Phasen; noch nicht gebaute Teile gekennzeichnet. Eine Phase ist erst fertig, wenn `docs/07` die Bedienung ihrer neuen Teile beschreibt (in `docs/03` und `CLAUDE.md`). README verweist auf `docs/07` |
+| Phasen | Phase 1 ohne Codeänderung. Phase 2: `config.py` mit Länderseiten-Datei, robots-Prüfung mit `base_url`, `sites/de.yaml`, Tests mit erfundenen Länderseiten, `docs/07` Teil A. Phase 4 = erste Länder-Prüfung (Deutschland). Phase 5: Sammler mit `site` und `region`, Browser-Profil je Länderseite. Phase 6: Sprachdaten nach Sprache, Muster je Land. Phase 7: Selbsttest prüft Länderteil und Vorhandensein der Sprach- und Länderdaten. Offener Punkt 11 ergänzt um „je Länderseite oder insgesamt?“ |
+| Unverändert | Datenregeln, Whitelist-Export, Hof-Code-Format `LAND-REGION-NNN`, harte Grenzen, Arbeitsweise aus `CLAUDE.md`, Code auf Englisch, Dokumentation auf Deutsch. Verweise auf `01_reiseplan.md` bleiben unverändert |
+
+**Von Claude Code ergänzt (Einspruch möglich)**
+
+| Ergänzung | Grund |
+|---|---|
+| `site` muss aus genau zwei Kleinbuchstaben bestehen | Unter Windows würde `site: "DE"` sonst `sites/de.yaml` laden, unter Linux (GitHub Actions) nicht |
+| Regionskürzel innerhalb einer Länderseite eindeutig; Format legt Phase 2 fest | Sonst bekämen zwei Regionen dasselbe Präfix im Hof-Code |
+| Doppelte YAML-Schlüssel ablehnen | PyYAML übernimmt nach bisherigem Kenntnisstand stillschweigend den letzten Wert; in Phase 2 per Test zu belegen |
+| Eindeutigkeit der Regionsschlüssel: `config.py` liest die Regionsschlüssel aller Dateien in `sites/`; Tests zeigen auf einen Ordner unter `tests/fixtures/` | Nur so lässt sich die Eindeutigkeit über alle Länderseiten prüfen, ohne dass Tests echte Länderseiten-Dateien lesen |
+| Erfundene Länderseiten in Tests mit Ländercodes, die ISO 3166-1 für Benutzerzwecke reserviert (z. B. `zz`, `xa`); robots-Tests ohne Netz | Keine Verwechslung mit echten Ländern; kein Zugriff auf echte Seiten |
+| `learning_categories` darf bis zur Länder-Prüfung leer sein; verlangt wird die Liste erst vom Export-Selbsttest (Phase 7) | Die Liste entsteht wie die Suchdefinition erst in der Länder-Prüfung; der Sammler braucht sie nicht |
+| Auch `exceptions` und `regex` der Taxonomie je Sprache; Normalisierung (ä→ae) für andere Sprachen eigens festlegen | Ausnahmen und Regeln wie „wir holen dich … ab“ sind sprachgebunden; Norwegisch hat æ, ø, å |
+| Teil C, Schritt 2: beim Beitritt die Mitgliedsbedingungen der Landesorganisation lesen; bei Widerspruch anhalten und entscheiden | Bedingungen der Landesorganisationen können sich unterscheiden; kein zusätzliches Gate im Code |
+| Regel für erfundene Rufnummern bei jeder weiteren Länderseite festlegen | Die Rufnummern der Bundesnetzagentur in harter Regel 7 gelten nur für Deutschland |
+| Für Deutschland folgen die Sprach- und Länderdaten (Teil C, Schritt 8) erst in Phase 6, nach dem ersten Lauf | Der Sammler braucht sie nicht; erst Stichworte, Bereinigung und Export |
+| Begriff „Landesseite“ in den Dokumenten durch „Länderseite“ ersetzt | Einheitliche Begriffe |
+| Keine Änderung an `.claude/settings.json`, `.gitignore`, Code und Tests | Dort steht nichts wwoof.de-Spezifisches; `browser_profile/` in `.gitignore` deckt die Unterordner je Länderseite ab |
+
+**Funde**
+
+| Thema | Ergebnis |
+|---|---|
+| `docs/00_projekt_uebersicht.md` | Meldete noch „Phase 1 ist in Arbeit“; korrigiert |
+| Ablage von Mustern und Formulierungen | Wo Muster für Postleitzahlen und Telefonnummern sowie Formulierungen der Bereinigung liegen, ist offen; Entscheidung in Phase 6 |
+| Unverändert bewusst | `help.wwoof.net` und `docs.wwoof.net` (Hilfe- und Dokumentseiten, keine Länderseiten) bleiben wie bisher außerhalb der harten Regel 3. Historische Tabellen in diesem Dokument und die Checkliste von Phase 0 in `docs/04` bleiben unverändert |

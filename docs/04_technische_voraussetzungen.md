@@ -1,6 +1,6 @@
 # Technische Voraussetzungen: Laptop einrichten (Windows)
 
-**Stand:** 06.11.2026 (Phase 0 abgeschlossen), ergänzt am 15.11.2026 (Abschnitt 8: Arbeitsweise mit Claude Code). Die Versionsangaben zu Python wurden am 31.10.2026 geprüft; bei späterer Einrichtung die aktuellen Hinweise auf python.org beachten.
+**Stand:** 06.11.2026 (Phase 0 abgeschlossen), ergänzt am 15.11.2026 (Abschnitt 8: Arbeitsweise mit Claude Code) und am 17.11.2026 (Länderseiten der CWP: Abschnitte 1, 3, 8). Die Versionsangaben zu Python wurden am 31.10.2026 geprüft; bei späterer Einrichtung die aktuellen Hinweise auf python.org beachten.
 
 **Gerät des Nutzers:** privater Windows-Laptop (Surface Pro 8). Diese Anleitung beschreibt deshalb nur Windows. Alle Befehle laufen in der **PowerShell**.
 
@@ -25,7 +25,7 @@
 | **Git** (Git for Windows) | Versionsverwaltung | **Pflicht**; bringt den Git Credential Manager für die Anmeldung bei GitHub mit |
 | **GitHub-Konto** | privates Repository | **Pflicht** |
 | **Claude Code** (lokal) | schreibt seit dem 15.11.2026 den Code | Einrichtung und Absicherung in Abschnitt 8 |
-| WWOOF-Deutschland-Mitgliedschaft | Zugang zu Hofprofilen | aktiv (01.11.2026); erst ab Phase 4 nötig |
+| WWOOF-Mitgliedschaft je Länderseite | Zugang zu Hofprofilen | Deutschland aktiv (01.11.2026), ab Phase 4 nötig; jede weitere Länderseite braucht eine eigene (`07_bedienung.md`, Teil C) |
 
 ---
 
@@ -71,7 +71,7 @@ Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 
 Nach der Aktivierung steht `(.venv)` vor der Eingabezeile. Ab jetzt bezieht sich `python` auf die virtuelle Umgebung.
 
-Die Unterordner im Datenordner (`browser_profile`, `local`, `export`, `logs`) legt das Skript später selbst an.
+Die Unterordner im Datenordner (`browser_profile` mit einem Unterordner je Länderseite, z. B. `browser_profile\de`, sowie `local`, `export`, `logs`) legt das Skript später selbst an.
 
 ---
 
@@ -217,7 +217,7 @@ Vor jedem Commit mit `git status` prüfen, dass nur Code, Konfiguration, Taxonom
 4. Sperre testen: eine Datei `access_test.txt` in `wwoof-data` anlegen. Als Kontrolle zuerst `requirements.txt` lesen lassen (muss klappen), dann Claude bitten, `access_test.txt` zu lesen. Erwartet: Der Zugriff wird abgelehnt. Danach die Datei löschen. (Erledigt am 06.11.2026.)
 5. Editor-Kontext beachten: Das Panel zeigt die gerade geöffnete Datei als Kontext. Öffne keine Dateien aus `wwoof-data` im Editor, solange das Panel offen ist. GitHub Copilot ist seit dem 15.11.2026 für diesen Arbeitsbereich abgeschaltet (Einstellung `chat.disableAIFeatures` in den Arbeitsbereichseinstellungen).
 
-**Grenze:** Die Deny-Regel greift nicht bei Skripten, die Dateien selbst öffnen (z. B. ein Python-Skript), und die Sandbox von Claude Code, die das auf Betriebssystemebene verhindern würde, läuft nicht unter nativem Windows. Deshalb gilt zusätzlich: Claude startet keine Skripte, die wwoof.de aufrufen oder echte Daten verarbeiten, und du prüfst jeden Befehl, bevor du ihn freigibst. Echte Läufe startest du selbst in einem eigenen PowerShell-Fenster.
+**Grenze:** Die Deny-Regel greift nicht bei Skripten, die Dateien selbst öffnen (z. B. ein Python-Skript), und die Sandbox von Claude Code, die das auf Betriebssystemebene verhindern würde, läuft nicht unter nativem Windows. Deshalb gilt zusätzlich: Claude startet keine Skripte, die eine Länderseite der CWP aufrufen oder echte Daten verarbeiten, und du prüfst jeden Befehl, bevor du ihn freigibst. Echte Läufe startest du selbst in einem eigenen PowerShell-Fenster.
 
 ---
 

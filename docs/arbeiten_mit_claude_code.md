@@ -1,6 +1,6 @@
 # Arbeiten mit Claude Code in diesem Projekt
 
-**Stand:** 15.11.2026 · Anleitung für dich. Die Regeln für Claude Code selbst stehen in `CLAUDE.md`.
+**Stand:** 15.11.2026, ergänzt am 17.11.2026 (Länderseiten der CWP, `docs/07_bedienung.md`) · Anleitung für dich. Die Regeln für Claude Code selbst stehen in `CLAUDE.md`.
 
 ---
 
@@ -69,10 +69,10 @@ Weitere Hilfen:
 - Sind nur die erwarteten Dateien geändert oder neu?
 - Verstehe ich jede Änderung? Wenn nicht: nachfragen.
 - Ist das Abnahmekriterium erfüllt? Hast du die Ausgabe gesehen? Selbst einmal ausführen lohnt sich.
-- Keine echten Daten, keine Pfade zu `wwoof-data`, keine Adressen von wwoof.de in Code oder Tests?
-- Ausgaben und Logs nur mit Hof-Codes und Zahlen?
+- Keine echten Daten, keine Pfade zu `wwoof-data`, keine Domain einer Länderseite außerhalb von `sites/`? Tests nur mit erfundenen Länderseiten-Dateien aus `tests/fixtures/`?
+- Ausgaben und Logs nur mit Hof-Codes, site_id und Zahlen?
 - Beim Sammler: Sind Pausen, Obergrenze, robots.txt-Prüfung und sauberer Abbruch eingebaut?
-- Ist `docs/06_fortschritt.md` aktualisiert?
+- Ist `docs/06_fortschritt.md` aktualisiert? Und `docs/07_bedienung.md`, wenn sich die Bedienung geändert hat?
 
 **Rückgängig machen:** Claude Code bitten („Nimm die Änderung an X zurück“), zurückspulen (Abschnitt 9) oder selbst `git restore <datei>`.
 
@@ -91,7 +91,7 @@ Claude Code fragt vor jedem Befehl. Einige rein lesende Befehle wie `ls`, `cat`,
 **Ablehnen:**
 - alles, was `wwoof-data` enthält
 - Skripte mit echter Konfiguration oder echten Daten (Sammler, Stichworte, Bereinigung, Export ohne Testpfad)
-- alles mit wwoof.de oder api.wwoof.net
+- alles mit einer Länderseite der CWP (z. B. wwoof.de, wwoofnorway.org) oder api.wwoof.net
 - `git add .` oder `git add -A`
 - Löschbefehle außerhalb von `out/`
 - jeden Befehl, den du nicht verstehst. Lehne ab und frag: „Was macht dieser Befehl?“
@@ -141,13 +141,7 @@ Fragen, die beim Lernen helfen:
 
 ## 10. Datenschutz im Alltag
 
-- **Echte Läufe (ab Phase 5) startest nur du**, in einem eigenen PowerShell-Fenster außerhalb von VS Code:
-  ```powershell
-  cd $HOME\Projekte\wwoof-planner
-  .\.venv\Scripts\Activate.ps1
-  python -m src.collector
-  ```
-  (Der Modulname gilt, sobald es den Sammler gibt.)
+- **Echte Läufe (ab Phase 5) startest nur du**, in einem eigenen PowerShell-Fenster außerhalb von VS Code. Wie, beschreibt `docs/07_bedienung.md`, Teil A (Länderseite und Region in `config.yaml` wählen, starten, einloggen).
 - Öffne **keine Dateien aus `wwoof-data` in VS Code**, solange das Claude-Panel offen ist. Echte Tabellen öffnest du in Excel oder LibreOffice.
 - Keine Screenshots, Links oder Textauszüge echter Hofseiten in den Chat; stattdessen Platzhalter wie `<FARM_NAME>`.
 - Fragt Claude Code nach `wwoof-data` oder will es einen echten Lauf starten: ablehnen und darauf hinweisen. Das ist ein Fehler, den wir beheben.
@@ -161,6 +155,7 @@ Fragen, die beim Lernen helfen:
 - **Ende einer Phase:** Claude Code aktualisiert den Status in `README.md` und setzt nach deinem OK einen Tag `phase-N`. Du pushst ihn mit `git push origin phase-N`.
 - **Ab Phase 2: GitHub Actions.** Nach jedem Push laufen die Tests auf GitHub. Das Ergebnis siehst du im Reiter „Actions“ des Repositorys und als Häkchen oder Kreuz am Commit.
 - **`docs/06_fortschritt.md`** ist das Logbuch des Projekts: Stand, Schrittplan, Entscheidungen, Funde. Auf GitHub jederzeit lesbar.
+- **`docs/07_bedienung.md`** ist die Bedienungsanleitung des Sammlers. Sie wächst mit den Phasen; eine Phase ist erst fertig, wenn dort ihre neuen Teile beschrieben sind.
 - **claude.ai-Projekt:** nur noch für die Reiseplanung. Den Export (Phase 7) lädst du dort hoch.
 
 ---

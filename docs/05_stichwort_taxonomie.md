@@ -1,12 +1,12 @@
 # Stichwort-Taxonomie (Entwurf, Version 1)
 
-**Stand:** 01.11.2026
+**Stand:** 01.11.2026, ergänzt am 17.11.2026 (Abschnitt 5: Sprachen und Länderseiten)
 
 Diese Taxonomie ordnet Begriffe aus Hofbeschreibungen Kategorien zu. Das Skript `tagging.py` wendet sie **lokal und KI-frei** an (siehe `03_programmierprojekt.md`, Abschnitt 6). Die **Kategorieschlüssel** (z. B. `vegetables`) gehen in den Export für Claude. Den Text selbst bekommt Claude nur als bereinigte, von dir freigegebene Fassung (siehe `03_programmierprojekt.md`, Abschnitt 7). Für Beschreibungen, die du nicht freigegeben hast, sind die Kategorien die einzige Information aus dem Text, die Claude erhält.
 
 Der Entwurf ist ein Startpunkt. In Phase 6 schärfst du ihn anhand der nicht abgedeckten Sätze nach.
 
-**Sprache (Entscheidung vom 01.11.2026):** Schlüssel und Strukturbegriffe der YAML-Datei sind englisch, weil sie Teil des Codes sind. Die Suchbegriffe bleiben deutsch und englisch, so wie sie in Profilen vorkommen. Die `label`-Texte bleiben deutsch, weil sie nur Anzeigetexte für dich sind.
+**Sprache (Entscheidung vom 01.11.2026):** Schlüssel und Strukturbegriffe der YAML-Datei sind englisch, weil sie Teil des Codes sind. Die Suchbegriffe bleiben deutsch und englisch, so wie sie in Profilen vorkommen. Die `label`-Texte bleiben deutsch, weil sie nur Anzeigetexte für dich sind. Seit dem 17.11.2026 werden die Suchbegriffe nach Sprache getrennt (Abschnitt 5).
 
 ---
 
@@ -295,5 +295,20 @@ groups:
 - **Ein Treffer pro Satz heißt nicht, dass der ganze Satz erfasst ist:** Die Abdeckungsprüfung markiert nur Sätze ganz ohne Treffer. Ein Satz mit einem Treffer kann weitere, nicht erfasste Informationen enthalten. Deshalb in jeder Runde auch einige abgedeckte Sätze stichprobenartig lesen.
 - **Trennbare Verben:** Im Deutschen stehen Verbteile oft weit auseinander („wir holen dich am Bahnhof ab“). Für „abholen“ gibt es dafür eine Regex-Regel; bei anderen Verben fallen solche Fälle erst bei Stichproben auf und werden dann ergänzt.
 - **Ortsnamen:** Begriffe wie „berg“ können in Ortsnamen stecken. „berg“ steht deshalb nur unter `whole_word`; Ortsnamen wie „Bamberg“ treffen dann nicht.
-- **Andere Sprachen:** Englisch ist abgedeckt; für Norwegen kämen später norwegische Begriffe hinzu.
-- **Lernkategorien der Plattform** stehen nicht in dieser Taxonomie. Sie werden in Phase 4 als feste Liste gesammelt und separat gespeichert.
+- **Andere Sprachen:** Deutsch und Englisch sind abgedeckt. Weitere Sprachen (z. B. Norwegisch) kommen über die Checkliste „Neue Länderseite“ dazu (`07_bedienung.md`, Teil C); siehe Abschnitt 5.
+- **Lernkategorien der Plattform** stehen nicht in dieser Taxonomie. Sie werden in der Länder-Prüfung (für Deutschland Phase 4) als feste Liste gesammelt und in der Länderseiten-Datei gespeichert (`learning_categories` in `sites/<site_id>.yaml`).
+
+---
+
+## 5. Sprachen und Länderseiten (Entscheidung vom 17.11.2026)
+
+Der Hof-Sammler kann jede Länderseite der Common WWOOF Platform erfassen. Beschreibungen können deshalb in verschiedenen Sprachen vorliegen. Dafür gilt:
+
+1. **Nach Sprache getrennt:** Suchbegriffe (`substring`, `whole_word`, `regex`), Ausnahmen (`exceptions`), Verneinungen (`settings.negations`) und die Ignorierliste (`ignore`) stehen je Sprache, gekennzeichnet mit einem Sprachcode wie in der Länderseiten-Datei (z. B. `"de"`, `"en"`). Dass auch Ausnahmen und reguläre Ausdrücke je Sprache stehen, hat Claude Code ergänzt (Einspruch möglich): „kohle“ als Ausnahme zu „kohl“ oder die Regel für „wir holen dich … ab“ sind deutsch.
+2. **Nur die Sprachen der Länderseite:** Für einen Hof werden nur die Sprachen angewendet, die in `languages` seiner Länderseite stehen. Welche Länderseite das ist, zeigt der Länderteil des Hof-Codes (`DE-…` → `sites/de.yaml`). Für Deutschland sind das Deutsch und Englisch.
+3. **Grund:** Begriffe kollidieren zwischen Sprachen. Norwegisch „sau“ heißt Schaf, deutsch „Sau“ ist ein Schwein. Stünde „sau“ als deutscher Begriff unter `pigs` und würden alle Sprachen auf alle Höfe angewendet, landete ein norwegischer Schafhof unter `pigs`.
+4. **Kategorien bleiben sprachunabhängig:** Gruppen- und Kategorieschlüssel (z. B. `sheep`) sind für alle Sprachen gleich; die `label`-Texte bleiben deutsch.
+5. **Fehlende Sprachdaten:** Steht in `languages` einer Länderseite eine Sprache, für die die Taxonomie keine Begriffe enthält, bricht die Stichwort-Erkennung für die betroffenen Höfe mit klarer Meldung ab. Die Meldung nennt nur Hof-Code, site_id und Sprachcode.
+6. **Normalisierung:** Die Vereinheitlichung aus Abschnitt 1 (ä→ae, ö→oe, ü→ue, ß→ss) ist auf Deutsch zugeschnitten. Für andere Sprachen (z. B. æ, ø, å im Norwegischen) werden die Regeln bei der Länder-Prüfung festgelegt.
+7. **YAML-Falle:** Sprachcodes stehen immer in Anführungszeichen; ein `no` ohne Anführungszeichen (Norwegisch) liest YAML als `false`.
+8. **Umstellung:** Der YAML-Block in Abschnitt 3 bleibt bis Phase 6 der gemischte Entwurf (deutsch und englisch). In Phase 6, Teil A, wird er beim Übernehmen nach `taxonomy.yaml` nach Sprache umgestellt; das genaue Format legen wir dann fest.
