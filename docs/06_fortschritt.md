@@ -7,11 +7,11 @@
 ## 1. Aktueller Stand
 
 - **Phase 0 abgeschlossen (06.11.2026).**
-- **Phase 1 in Arbeit.** Die Schritte 1–4 sind erledigt und gepusht: Projektstruktur und README, erfundene Testdaten, CSV lesen (`src/farm_table.py`), nach Region filtern und Ergebnis schreiben (`src/filter_region.py`). Schritt 5 (Felder umwandeln, `src/farm_stats.py`) Schritt 6 (Doppelungen erkennen) und Schritt 7 (Vergleich mit pandas, `src/farm_pandas.py`) am 15.11.2026 von Claude Code umgesetzt. Schritt 8 (CSV-Format-Test mit Excel, `src/table_roundtrip.py`) am 17.11.2026 erledigt; das CSV-Format steht fest.
+- **Phase 1 abgeschlossen (17.11.2026)**, Tag `phase-1`. Die Schritte 1–4 sind erledigt und gepusht: Projektstruktur und README, erfundene Testdaten, CSV lesen (`src/farm_table.py`), nach Region filtern und Ergebnis schreiben (`src/filter_region.py`). Schritt 5 (Felder umwandeln, `src/farm_stats.py`) Schritt 6 (Doppelungen erkennen) und Schritt 7 (Vergleich mit pandas, `src/farm_pandas.py`) am 15.11.2026 von Claude Code umgesetzt. Schritt 8 (CSV-Format-Test mit Excel, `src/table_roundtrip.py`) am 17.11.2026 erledigt; das CSV-Format steht fest.
 - **Umstellung am 15.11.2026:** Claude Code schreibt den Code schrittweise, der Nutzer prüft, lässt sich erklären und pusht selbst. Regeln in `CLAUDE.md`, Entscheidungen in Abschnitt 6 (15.11.2026), Anleitung in `docs/arbeiten_mit_claude_code.md`.
 - **Schritt 0 (Umstellung) umgesetzt am 15.11.2026**; Commit `Set up Claude Code workflow`, Push durch den Nutzer.
 - **Außerhalb des Schrittplans:** Die lokale Änderung an `src/filter_region.py` vom 11.11.2026 (Kommentare) hat der Nutzer behalten; eigener Commit `Phase 1: tidy comments in filter_region`.
-- **Nächster Schritt:** Phase 1, Schritt 9 (Abschluss: Verständnisfragen, README-Status, Tag `phase-1`).
+- **Nächster Schritt:** Phase 2 (Konfiguration, robots.txt, pytest, GitHub Actions); Claude Code schlägt den ersten Schritt nach `docs/03_programmierprojekt.md`, Phase 2, vor.
 
 ---
 
@@ -32,7 +32,7 @@
 | Phase | Inhalt | Status |
 |---|---|---|
 | 0 | Einrichtung, Git und GitHub, Ordnertrennung, Claude Code mit Sperre des Datenordners | erledigt (06.11.2026) |
-| 1 | Python-Grundlagen, erfundene Testdaten, CSV-Format | in Arbeit (seit 08.11.2026) |
+| 1 | Python-Grundlagen, erfundene Testdaten, CSV-Format | erledigt (17.11.2026) |
 | 2 | Konfiguration, robots.txt, pytest, GitHub Actions | offen |
 | 3 | HTML/CSS-Grundlagen, Playwright auf Übungsseiten | offen |
 | 4 | wwoof.de erkunden (Gate erfüllt) | offen |
@@ -51,7 +51,7 @@
 | Neue Dateien prüfen: `CLAUDE.md`, `.claude/settings.json`, `.vscode/settings.json`, `docs/` | erledigt (15.11.2026) |
 | `.gitignore` ergänzen um `.claude/settings.local.json` und `CLAUDE.local.md` (persönliche Einstellungen gehören nicht ins Repository) | erledigt (15.11.2026) |
 | `README.md`: Ordnertabelle um `docs/` ergänzen; Verweis auf `CLAUDE.md` und `docs/arbeiten_mit_claude_code.md`; fehlendes „außerhalb“ in der Einleitung ergänzt | erledigt (15.11.2026) |
-| Commit `Set up Claude Code workflow`; der Nutzer pusht | Commit nach OK des Nutzers |
+| Commit `Set up Claude Code workflow`; der Nutzer pusht | erledigt (15.11.2026) |
 
 ### 4.2 Schrittplan Phase 1
 
@@ -67,7 +67,7 @@ Seit 15.11.2026 schreibt Claude Code den Code; der Nutzer prüft. Den Test mit E
 | 6 | Doppelungen über `profile_url` erkennen und mit Hof-Codes melden | `Phase 1: detect duplicate profile URLs` | erledigt (15.11.2026) |
 | 7 | pandas: dieselbe Auswertung wie in den Schritten 4–6, Ergebnisse vergleichen | `Phase 1: explore farm table with pandas` | erledigt (15.11.2026) |
 | 8 | CSV-Format-Test: Vergleichsskript (Claude Code); der Nutzer öffnet eine Kopie in `out/` mit Excel oder LibreOffice, ändert, speichert; das Skript vergleicht. Format festlegen und in `docs/03_programmierprojekt.md`, Abschnitt 5.5, eintragen | `Phase 1: compare tables after spreadsheet round trip` | erledigt (17.11.2026) |
-| 9 | Abschluss: Verständnisfragen, README-Status, Tag `phase-1` | `Phase 1: complete` | offen |
+| 9 | Abschluss: Verständnisfragen, README-Status, Tag `phase-1` | `Phase 1: complete` | erledigt (17.11.2026) |
 
 **Einzelheiten zu Schritt 5** (Entwurf vom 08.11.2026, von Claude mit den Testdaten geprüft):
 
@@ -278,3 +278,12 @@ Derzeit keine. Die offenen Punkte zur Reise und zum Sammler stehen in `docs/00_p
 | Datum | Excel speichert `retrieved_on` als `TT.MM.JJJJ` statt `JJJJ-MM-TT` (alle 5 Zeilen) | Entscheidung des Nutzers: Dateien, die nur Skripte schreiben, in Excel nur ansehen, nie speichern; Datumsspalten in Nutzerdateien in beiden Formaten lesen (Vormerkung Phase 6 in 4.3). Eingetragen in 03, Abschnitt 5.5 |
 | Zeilenumbruch am Dateiende | Die Fixture endet ohne Zeilenumbruch; Excel hängt einen an. `compare` zählt einen Zeilenumbruch am Dateiende deshalb nicht mehr als Abweichung | `csv.writer` schreibt ihn ebenfalls immer |
 | CSV-Format | Festgelegt: `;`, UTF-8 mit BOM, Listen mit `\|`, CRLF; Speichern in Excel nur als „CSV UTF-8“ | Abnahmekriterium der Phase erfüllt; `CLAUDE.md` angepasst |
+
+### 17.11.2026 – Phase 1, Schritt 9: Abschluss der Phase (Claude Code und Nutzer)
+
+| Thema | Ergebnis | Belege und Hinweise |
+|---|---|---|
+| Abnahme | Alle technischen Kriterien aus 4.2 erfüllt | Von Claude Code mit der Fixture geprüft: `filter_region` voralpenland 3 Höfe; sachsen per Hilfsskript (Region ist Konstante im Modul) DE-SN-001, DE-SN-002; `farm_stats` meldet DE-VA-001/DE-VA-003; fehlende Datei und vertauschte Spalten mit klarer Meldung, Exit-Code 1, ohne Traceback; `farm_pandas` 7 × `same` |
+| Verständnisfragen | Fünf Fragen gestellt (Spaltenprüfung und `None` in `read_farms`, mehrzeilige Felder und `newline=""`, Fehlermeldungen ohne Werte, `keep_default_na`/`kind="stable"` in pandas, Byte-Prüfung in `table_roundtrip`). Laut Nutzer beantwortet | Die Antworten hat Claude Code nicht gesehen; besprochen wurden sie nicht. Damit ist auch die Wiederholung der Fragen vom 08.11.2026 nur vom Nutzer bestätigt. Der Nutzer hat den Abschluss ausdrücklich beauftragt. Nachbesprechung jederzeit möglich |
+| README | Phase 1 abgehakt; Startbefehle aller Skripte ergänzt | – |
+| Beobachtung | Ein Skript außerhalb des Repository-Ordners findet `src` nur mit `PYTHONPATH` auf das Repository | Gleiche Ursache wie beim ▷-Knopf (08.11.2026) |

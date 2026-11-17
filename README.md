@@ -25,12 +25,18 @@ Den Code schreibt Claude Code schrittweise; der Nutzer prüft, lässt sich erkl�
 
 Im Ordner `wwoof-planner` mit aktivierter virtueller Umgebung:
 
-    python -m src.filter_region
+    python -m src.filter_region                 # filter by region, write to out/
+    python -m src.farm_stats                    # guestbook counts, categories, duplicates
+    python -m src.farm_pandas                   # same evaluations with pandas, compared
+    python -m src.table_roundtrip prepare       # copy test table for the spreadsheet test
+    python -m src.table_roundtrip compare       # compare after saving in Excel
+
+Alle Skripte arbeiten mit den erfundenen Testdaten in `tests/fixtures/`.
 
 ## Stand
 
 - [x] Phase 0 – Einrichtung
-- [ ] Phase 1 – Python-Grundlagen, Testdaten, CSV-Format
+- [x] Phase 1 – Python-Grundlagen, Testdaten, CSV-Format
 - [ ] Phase 2 – Konfiguration, robots.txt, pytest
 - [ ] Phase 3 – HTML/CSS, Playwright auf Übungsseiten
 - [ ] Phase 4 – wwoof.de erkunden
