@@ -1,17 +1,17 @@
 # Fortschritt
 
-**Stand:** 15.11.2026 · gepflegt von Claude Code nach jedem Schritt (bis 15.11.2026 von Claude im claude.ai-Projekt)
+**Stand:** 17.11.2026 · gepflegt von Claude Code nach jedem Schritt (bis 15.11.2026 von Claude im claude.ai-Projekt)
 
 ---
 
 ## 1. Aktueller Stand
 
 - **Phase 0 abgeschlossen (06.11.2026).**
-- **Phase 1 in Arbeit.** Die Schritte 1–4 sind erledigt und gepusht: Projektstruktur und README, erfundene Testdaten, CSV lesen (`src/farm_table.py`), nach Region filtern und Ergebnis schreiben (`src/filter_region.py`). Schritt 5 (Felder umwandeln, `src/farm_stats.py`) Schritt 6 (Doppelungen erkennen) und Schritt 7 (Vergleich mit pandas, `src/farm_pandas.py`) am 15.11.2026 von Claude Code umgesetzt.
+- **Phase 1 in Arbeit.** Die Schritte 1–4 sind erledigt und gepusht: Projektstruktur und README, erfundene Testdaten, CSV lesen (`src/farm_table.py`), nach Region filtern und Ergebnis schreiben (`src/filter_region.py`). Schritt 5 (Felder umwandeln, `src/farm_stats.py`) Schritt 6 (Doppelungen erkennen) und Schritt 7 (Vergleich mit pandas, `src/farm_pandas.py`) am 15.11.2026 von Claude Code umgesetzt. Schritt 8 (CSV-Format-Test mit Excel, `src/table_roundtrip.py`) am 17.11.2026 erledigt; das CSV-Format steht fest.
 - **Umstellung am 15.11.2026:** Claude Code schreibt den Code schrittweise, der Nutzer prüft, lässt sich erklären und pusht selbst. Regeln in `CLAUDE.md`, Entscheidungen in Abschnitt 6 (15.11.2026), Anleitung in `docs/arbeiten_mit_claude_code.md`.
 - **Schritt 0 (Umstellung) umgesetzt am 15.11.2026**; Commit `Set up Claude Code workflow`, Push durch den Nutzer.
 - **Außerhalb des Schrittplans:** Die lokale Änderung an `src/filter_region.py` vom 11.11.2026 (Kommentare) hat der Nutzer behalten; eigener Commit `Phase 1: tidy comments in filter_region`.
-- **Nächster Schritt:** Phase 1, Schritt 8 (CSV-Format-Test mit Excel oder LibreOffice).
+- **Nächster Schritt:** Phase 1, Schritt 9 (Abschluss: Verständnisfragen, README-Status, Tag `phase-1`).
 
 ---
 
@@ -66,7 +66,7 @@ Seit 15.11.2026 schreibt Claude Code den Code; der Nutzer prüft. Den Test mit E
 | 5 | Felder umwandeln (Einzelheiten unten) | `Phase 1: parse list and number fields` | erledigt (15.11.2026) |
 | 6 | Doppelungen über `profile_url` erkennen und mit Hof-Codes melden | `Phase 1: detect duplicate profile URLs` | erledigt (15.11.2026) |
 | 7 | pandas: dieselbe Auswertung wie in den Schritten 4–6, Ergebnisse vergleichen | `Phase 1: explore farm table with pandas` | erledigt (15.11.2026) |
-| 8 | CSV-Format-Test: Vergleichsskript (Claude Code); der Nutzer öffnet eine Kopie in `out/` mit Excel oder LibreOffice, ändert, speichert; das Skript vergleicht. Format festlegen und in `docs/03_programmierprojekt.md`, Abschnitt 5.5, eintragen | `Phase 1: compare tables after spreadsheet round trip` | offen |
+| 8 | CSV-Format-Test: Vergleichsskript (Claude Code); der Nutzer öffnet eine Kopie in `out/` mit Excel oder LibreOffice, ändert, speichert; das Skript vergleicht. Format festlegen und in `docs/03_programmierprojekt.md`, Abschnitt 5.5, eintragen | `Phase 1: compare tables after spreadsheet round trip` | erledigt (17.11.2026) |
 | 9 | Abschluss: Verständnisfragen, README-Status, Tag `phase-1` | `Phase 1: complete` | offen |
 
 **Einzelheiten zu Schritt 5** (Entwurf vom 08.11.2026, von Claude mit den Testdaten geprüft):
@@ -95,6 +95,7 @@ Seit 15.11.2026 schreibt Claude Code den Code; der Nutzer prüft. Den Test mit E
 | 4 | Prüfen, ob eine Lernkategorie der Plattform das Zeichen `\|` enthält; sonst würde `split_list` sie zerlegen | 15.11.2026 |
 | 4 | Regel für die Normalisierung von `profile_url` festlegen und in `find_duplicate_profile_urls` übernehmen (bis dahin exakter Vergleich) | Schritt 6, 15.11.2026 |
 | 5 | Der Sammler löst einen Fehler aus, wenn ein Listenwert das Trennzeichen enthält, statt ihn falsch zu speichern | Vorschlag von Claude, 15.11.2026 (Einspruch möglich) |
+| 6 | Datumsspalten in `sanitization.csv` (`reviewed_on`) in beiden Formaten lesen (`JJJJ-MM-TT` und `TT.MM.JJJJ`), weil Excel beim Speichern umwandelt; andere Formate mit klarer Meldung ablehnen | Schritt 8, 17.11.2026 |
 | alle | Dateinamen nicht aus Werten ableiten, die sich nur in der Schreibung unterscheiden (Windows) | Schritt 4, 08.11.2026 |
 
 ---
@@ -267,3 +268,13 @@ Derzeit keine. Die offenen Punkte zur Reise und zum Sammler stehen in `docs/00_p
 | Kategorien | Vergleich ohne Reihenfolge, weil gleich häufige Kategorien in `most_common()` und `value_counts()` unterschiedlich geordnet sein können (für pandas 3.1 nicht geprüft) | – |
 | Dateinamen | Unterscheiden sich Regionsnamen nur in der Schreibung, bricht das Skript mit klarer Meldung ab, statt Dateien zu überschreiben | Umsetzung der Vormerkung aus Schritt 4 (Windows) |
 | Weitere Prüfung | Erfundene Tabelle mit leerem Kategorienfeld, `NA`/`null` in Textfeldern, mehrzeiliger Beschreibung mit `;` und Anführungszeichen, gleichen Gästebuchzahlen und drei Höfen mit gleicher URL: alles `same` | Prüfskript lag nur im Scratchpad; ab Phase 2 als pytest-Test |
+
+### 17.11.2026 – Phase 1, Schritt 8: CSV-Format-Test mit Excel (Claude Code und Nutzer)
+
+| Thema | Ergebnis | Hinweise |
+|---|---|---|
+| `src/table_roundtrip.py` | `prepare` kopiert die Fixture nach `out/roundtrip/`; `compare` prüft BOM, Kodierung, Trennzeichen und Zeilenenden auf Byte-Ebene und vergleicht dann jedes Feld mit `read_farms`. Erwartet ist genau eine Änderung (DE-SN-002, `guestbook_count` 3 → 4). Ausgabe nur Hof-Codes, Spalten, Längen und Status | Vorher mit simulierten Varianten geprüft: unverändert, erwartet, ANSI ohne BOM, Komma, umgewandeltes Datum, LF im mehrzeiligen Feld, fehlende Datei |
+| Test des Nutzers | Excel, gespeichert als „CSV UTF-8 (durch Trennzeichen getrennt)“: BOM, UTF-8, `;`, Umlaute, mehrzeilige Beschreibung, `\|`-Listen und `available_windows` unverändert; erwartete Änderung erkannt | Der Gegentest mit „CSV (Trennzeichen-getrennt)“ entfällt, weil nur „CSV UTF-8“ zugelassen ist; ob jene Option ANSI ohne BOM speichert, ist daher nicht geprüft |
+| Datum | Excel speichert `retrieved_on` als `TT.MM.JJJJ` statt `JJJJ-MM-TT` (alle 5 Zeilen) | Entscheidung des Nutzers: Dateien, die nur Skripte schreiben, in Excel nur ansehen, nie speichern; Datumsspalten in Nutzerdateien in beiden Formaten lesen (Vormerkung Phase 6 in 4.3). Eingetragen in 03, Abschnitt 5.5 |
+| Zeilenumbruch am Dateiende | Die Fixture endet ohne Zeilenumbruch; Excel hängt einen an. `compare` zählt einen Zeilenumbruch am Dateiende deshalb nicht mehr als Abweichung | `csv.writer` schreibt ihn ebenfalls immer |
+| CSV-Format | Festgelegt: `;`, UTF-8 mit BOM, Listen mit `\|`, CRLF; Speichern in Excel nur als „CSV UTF-8“ | Abnahmekriterium der Phase erfüllt; `CLAUDE.md` angepasst |

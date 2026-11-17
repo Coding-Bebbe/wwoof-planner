@@ -59,7 +59,7 @@ Diese Regeln gelten immer, auch wenn ein Auftrag etwas anderes nahelegt. Im Zwei
 ## Konventionen
 
 - Code komplett englisch: Bezeichner, Kommentare, Datei-, Ordner- und Spaltennamen, Programmausgaben. Deutsche Suchbegriffe (Taxonomie, Verneinungen, Bereinigung) bleiben deutsch. Dokumentation deutsch.
-- CSV: Trennzeichen `;`, Kodierung `utf-8-sig`, Listen in Feldern mit `|`. Gilt vorläufig, bis der Test mit Excel in Phase 1 (Schritt 8) das Format bestätigt.
+- CSV: Trennzeichen `;`, Kodierung `utf-8-sig`, Listen in Feldern mit `|`. Bestätigt in Phase 1, Schritt 8; Speicherregel und Datumsregel in `docs/03_programmierprojekt.md`, Abschnitt 5.5.
 - Laufzeitprüfungen lösen eigene Exceptions aus, kein `assert` (außer in Tests).
 - Module liegen im Paket `src/`; Start aus dem Repository-Ordner mit `python -m src.<modul>`.
 - Ausgaben aus Testläufen landen in `out/` (von Git ausgeschlossen).

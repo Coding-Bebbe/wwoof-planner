@@ -217,7 +217,12 @@ export:
 ### 5.5 Konventionen
 
 - **Sprache:** Der Code ist komplett englisch: Bezeichner, Kommentare, Datei- und Ordnernamen, Spaltennamen, Konfigurationsschlüssel und Programmausgaben. Ausnahme sind deutsche Begriffe, nach denen der Code sucht (Taxonomie, Verneinungen, Formulierungen in der Bereinigung). Die `label`-Texte in `taxonomy.yaml` bleiben deutsch, weil sie nur Anzeigetexte für dich sind. Die Dokumentation bleibt deutsch.
-- **CSV-Format (Vorschlag, in Phase 1 bestätigen):** Trennzeichen `;` und Kodierung UTF-8 mit BOM (`utf-8-sig`). Mit diesen Einstellungen öffnet ein deutsches Excel die Dateien per Doppelklick mit richtigen Spalten und Umlauten. Listen innerhalb eines Feldes werden mit `|` getrennt. Ob Excel beim Speichern Trennzeichen und Kodierung beibehält, testen wir in Phase 1 mit erfundenen Daten.
+- **CSV-Format (festgelegt am 17.11.2026 nach dem Test in Phase 1, Schritt 8):** Trennzeichen `;` und Kodierung UTF-8 mit BOM (`utf-8-sig`). Mit diesen Einstellungen öffnet ein deutsches Excel die Dateien per Doppelklick mit richtigen Spalten und Umlauten. Listen innerhalb eines Feldes werden mit `|` getrennt. Zeilenenden CRLF.
+  - **Speichern in Excel nur als „CSV UTF-8 (durch Trennzeichen getrennt)“.** Damit blieben im Test BOM, Kodierung, Trennzeichen, Umlaute, mehrzeilige Felder und `|`-Listen erhalten.
+  - **Excel wandelt Datumswerte um:** Aus `2026-11-08` wird beim Speichern `08.11.2026`. Deshalb:
+    - Dateien, die nur Skripte schreiben (`farms.csv`, `keyword_report.csv`, Export), in Excel nur ansehen, nie speichern.
+    - Datumsspalten in Dateien, die du bearbeitest (z. B. `reviewed_on` in `sanitization.csv`), liest das Skript in beiden Formaten (`JJJJ-MM-TT` und `TT.MM.JJJJ`).
+  - Prüfwerkzeug: `python -m src.table_roundtrip prepare` und `compare` (nur mit der erfundenen Testdatei).
 - **Tests:** pytest ab Phase 2, im Ordner `tests/`, nur mit erfundenen Höfen. Prüfungen, die zur Laufzeit abbrechen sollen (Grenzwerte, Export-Selbsttest), lösen eigene Fehler (Exceptions) aus statt `assert`, weil Python `assert`-Anweisungen mit der Option `-O` abschaltet.
 - **Git:** Jede abgeschlossene Aufgabe wird ein Commit. Vor jedem Commit zeigt `git status`, was hineinkommt. Der Datenordner liegt außerhalb des Repositorys und ist zusätzlich per `.gitignore` ausgeschlossen (Abschnitt 10).
 
