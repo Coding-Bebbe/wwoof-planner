@@ -109,7 +109,7 @@ Projekte\
 │   │   ├── robots_check.py    robots.txt prüfen
 │   │   ├── explore_site.py    Erkundung: Seiten lokal sichern, Struktur-Skelett schreiben
 │   │   ├── page_skeleton.py   HTML in ein Skelett ohne Inhalte umwandeln
-│   │   ├── session.py         Browser mit persistentem Profil starten
+│   │   ├── session.py         Browser mit persistentem Profil starten, Seite laden (ab Phase 2)
 │   │   ├── region_list.py     Suchergebnisse einer Region lesen
 │   │   ├── profile_reader.py  ein Profil lesen, Felder extrahieren
 │   │   ├── collector.py       Steuerung: Grenzen, Pausen, Hof-Codes, Abgleich, Fortsetzen, Logging
@@ -187,7 +187,7 @@ Alle Daten liegen als CSV-Dateien vor. Sie lassen sich in Excel oder LibreOffice
 
 **Profil-Link-Listen** (nur lokal; schreibt der Sammler): eine Datei je Länderseite und Region; der Name enthält site_id und Regionsschlüssel in Kleinbuchstaben, z. B. `links_de_voralpenland.csv`. Den genauen Namen legen wir in Phase 3 fest.
 
-**`local/samples/<site_id>/`** und **`local/structure/<site_id>/`** (nur lokal; schreibt das Erkundungsskript in Phase 2): gesicherte Seiten und ihre Struktur-Skelette. Die Skelette darfst du nach Prüfung mit Claude teilen, die gesicherten Seiten nie.
+**`local/samples/<site_id>/`** und **`local/structure/<site_id>/`** (nur lokal; schreibt das Erkundungsskript in Phase 2): gesicherte Seiten und ihre Struktur-Skelette, Dateinamen `<JJJJMMTT-HHMMSS>-<n>` je Lauf, nie überschrieben. `samples/<site_id>/index.csv` ordnet jede Datei ihrer URL zu (`file;url;status;saved_at`). Die Skelette darfst du nach Prüfung mit Claude teilen, die gesicherten Seiten und `index.csv` nie.
 
 **`export/export_for_claude.csv`** (geht an Claude; lädst du selbst hoch)
 
@@ -329,14 +329,27 @@ Die Stichwort-Kategorien strukturieren die Bewertung. Zusammen mit dem Steckbrie
 - **Du lernst:** pytest, GitHub Actions, YAML und seine Fallen, eigene Exceptions, `urllib.robotparser`, HTML, CSS und DOM (am Skelett), Playwright (persistentes Profil, Warten auf JavaScript-Inhalte, Login), Entwicklerwerkzeuge des Browsers.
 - **Aufgaben:**
   1. **Grundlagen:** pytest und ein GitHub-Actions-Workflow (Tests bei jedem Push); `robots_check.py` mit Tests an erfundenem robots.txt-Text; `config.load_site()` lädt und prüft `sites/<site>.yaml` (Prüfungen in Abschnitt 5.4); `sites/de.yaml` mit `base_url`, `languages` und den Regionen `voralpenland` (`VA`) und `sachsen` (`SN`) nur mit Schlüssel und Kürzel; Tests mit erfundenen Länderseiten, darunter `site: no` ohne Anführungszeichen und eine Region ohne Suchdefinition.
-  2. **Erkundungsskript** `src/explore_site.py` mit `src/page_skeleton.py` (siehe unten), Tests an erfundenem HTML; Claude Code testet das Skript auf quotes.toscrape.com (Login, JavaScript-Seite `/js/`), ohne Fenster, Ausgaben nach `out/`.
+  2. **Erkundungsskript** `src/explore_site.py` mit `src/page_skeleton.py` und `src/session.py` (siehe unten), Tests an erfundenem HTML und mit einer Attrappe statt Browser; Claude Code testet das Skript auf quotes.toscrape.com (Startseite, JavaScript-Seite `/js/`, Login-Seite, Abbruch bei 404), ohne Fenster, Ausgaben nach `out/`.
   3. **Dein Lauf:** Vorab-Sichtung von Hand (Regionsfilter, ungefähre Hofzahlen je Region, Gästebuch-Anzahl, Kalender, Lernkategorien, URL-Muster); dann Lauf auf wwoof.de (Suchseite je Region, 2–3 Profile, bei Bedarf Reiter wie Gästebuch oder Kalender); Skelette prüfen und teilen.
   4. **Auswertung:** Aufbau dokumentieren (Abschnitt 4: was plattformweit und was länderspezifisch ist, und an welcher Stelle im Code das Plattformweite steht); Entwurf der Selektoren; Regel für die Normalisierung von `profile_url` (mit Domain); prüfen, ob eine Lernkategorie das Zeichen `|` enthält; offene Punkte 10 (Voralpenland), 11 (Umfang) und 12 (Kalender) entscheiden; erfundene Testseiten mit demselben Aufbau in `tests/fixtures/pages/`.
   5. **Attrappe:** Claude Code erzeugt einen erfundenen Export im geplanten Format in `out/`; du testest im claude.ai-Projekt, ob Bewertung und Routenplanung damit gelingen; Export-Spalten und Anforderungen an den Steckbrief festhalten.
 - **Erkundungsskript:**
-  - Aufruf durch dich: `python -m src.explore_site --site de --data-dir <Datenordner> <URL> [<URL> …]`. Die URLs gibst du an; jede muss mit der `base_url` der Länderseite beginnen. So steht keine Domain im Code.
-  - Ablauf: robots.txt prüfen; Browser mit dem Profil `browser_profile/<site>/`, bei Bedarf Login von Hand und Bestätigen mit Enter; je URL Seite öffnen und warten, bei Status ab 400 Abbruch; gerenderte Seite **nur lokal** in `local/samples/<site>/` sichern, Skelett in `local/structure/<site>/` schreiben; Pause 10–20 Sekunden; **harte Grenze 5 Seiten pro Lauf**; im Terminal nur Zähler, Dateinamen und Status.
-  - Skelett: `script`, `style`, `svg`, Kommentare und `meta` entfernt; Text wird zu `⟨TEXT:n⟩` bzw. `⟨NUM:n⟩` (n = Länge); alle Attributwerte außer `class`, `role` und `type` werden zu `⟨VAL:n⟩`, Links zu `⟨URL⟩`; gleichartige Geschwister werden zusammengefasst (die ersten zwei und „× N“); die Größe ist begrenzt.
+  - Aufruf durch dich: `python -m src.explore_site --site de --data-dir <Datenordner> <URL> [<URL> …]`. Die URLs gibst du an; jede muss zur Länderseite gehören (`https://` und Host der `base_url`). So steht keine Domain im Code. Claude Code nutzt zusätzlich `--headless` (kein Fenster, keine Login-Pause, keine Startseite) und `--sites-dir` für die Übungsseite.
+  - Ablauf (umgesetzt am 18.11.2026; Bedienung in `07_bedienung.md`, A.0):
+    - Vor jedem Seitenaufruf: 1–5 URLs, keine doppelt, jede zur Länderseite; Datenordner vorhanden und außerhalb des Repositorys (Testläufe: unter `out/`); robots.txt erlaubt Startseite und alle URLs.
+    - Browser mit dem Profil `browser_profile/<site>/` (`src/session.py`, feste Fenstergröße). Im Fenster-Modus öffnet das Skript die Startseite; du loggst dich bei Bedarf von Hand ein und bestätigst mit Enter.
+    - Je URL: Pause, Seite öffnen, auf Laden und Netzwerkruhe warten (höchstens 10 s, sonst Hinweis `network busy`); gerenderte Seite **nur lokal** in `local/samples/<site>/` sichern, Skelett in `local/structure/<site>/`, Zeile in `index.csv`.
+    - Pause zufällig 10–20 Sekunden zwischen zwei Seitenaufrufen, mindestens das Crawl-delay; die Zeit fürs Einloggen zählt mit. **Harte Grenze 5 Seiten pro Lauf** (plus die nicht gesicherte Startseite).
+    - Abbruch ohne Sichern bei: keiner Antwort, Status ab 400, Umleitung auf einen anderen Host oder Pfad, Browserfehler, Strg+C. Captcha und Login-Aufforderung im Seiteninhalt erkennt das Skript noch nicht; du schaust im Fenster zu und brichst mit Strg+C ab. Die Erkennung kommt mit den Selektoren in Phase 3.
+    - Im Terminal nur Zähler, Dateinamen und Status; Meldungen von Playwright werden ohne URL wiedergegeben.
+  - Skelett (`src/page_skeleton.py`, präzisiert am 18.11.2026):
+    - Entfernt mit Inhalt: Kommentare, `head` (enthält u. a. den Seitentitel), `script`, `style`, `meta`, `link`, `noscript`, `template`. `svg` bleibt als Element mit Klassen, ohne Inhalt (Icons helfen bei Selektoren).
+    - Text wird zu `⟨TEXT:n⟩` bzw. `⟨NUM:n⟩` (nur Ziffern und Zeichen von Zahlen und Daten; n = Länge).
+    - Attributwerte außer `class`, `role` und `type` werden zu `⟨VAL:n⟩`, Links (z. B. `href`, `src`, `mailto:`) zu `⟨URL⟩`. In Klassen werden Ziffernfolgen ab 3 Stellen zu `⟨NUM:n⟩` (Profil-IDs); ungewöhnliche Klassen und `role`/`type`-Werte zu `⟨VAL:n⟩`.
+    - Gleichartige Geschwister (gleiche Struktur, Textlängen egal) werden ab 3 zusammengefasst: die ersten zwei und „⋯ × N more like above“.
+    - Grenzen: 4000 Zeilen, 100 Ebenen.
+    - Am Ende eine Liste aller lesbaren Wörter (Elemente, Attribute, Klassen, `role`/`type`-Werte) für deine Prüfung.
+    - `python -m src.page_skeleton <samples> <structure>` erzeugt die Skelette aus gesicherten Seiten neu, ohne Seitenaufruf.
   - Das Skelett darfst du nach deiner Prüfung (Checkliste in `07_bedienung.md`, Teil A.0) mit Claude teilen (`02_regeln_und_rahmenbedingungen.md`, Abschnitt 2). Die gesicherten Seiten bleiben lokal; mit ihnen prüfst du in Phase 3 den Leser offline, ohne erneute Seitenaufrufe.
   - Seitenaufrufe der Erkundung sind keine Erfassung: In `farms.csv` kommt ein Hof erst durch den Sammler.
 - **Fertig, wenn:**

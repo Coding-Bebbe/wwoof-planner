@@ -23,9 +23,9 @@
 
 ## Teil A – Erkundung und Sammellauf
 
-### A.0 Länderseite erkunden – noch nicht gebaut (Phase 2)
+### A.0 Länderseite erkunden
 
-Zweck: den Aufbau einer Länderseite kennenlernen, bevor der Sammler entsteht (Länder-Prüfung, Teil C, Schritt 6).
+Zweck: den Aufbau einer Länderseite kennenlernen, bevor der Sammler entsteht (Länder-Prüfung, Teil C, Schritt 6). Seitenaufrufe der Erkundung sind keine Erfassung; in `farms.csv` kommt nichts.
 
 1. **Vorab von Hand:** Sieh dir die Länderseite als Mitglied im normalen Browser an und notiere nur Strukturen und Zahlen:
    - Wie filtert die Suche nach Regionen?
@@ -33,24 +33,45 @@ Zweck: den Aufbau einer Länderseite kennenlernen, bevor der Sammler entsteht (L
    - Ist die Gästebuch-Anzahl als Zahl sichtbar?
    - Gibt es einen Kalender?
    - Werden Lernkategorien angezeigt?
-   - Wie sind Profil-URLs aufgebaut (Muster mit Platzhaltern)?
+   - Wie sind Profil-URLs aufgebaut (Muster mit Platzhaltern, z. B. `/<SPRACHE>/hosts/<ZAHL>`)?
+   - Wähle die URLs für den Lauf aus: Suchseite je Region, 2–3 Profile, bei Bedarf Reiter wie Gästebuch oder Kalender.
 2. **Skript starten** im eigenen PowerShell-Fenster mit aktivierter Umgebung (A.1):
    ```powershell
    python -m src.explore_site --site de --data-dir ..\wwoof-data <URL> [<URL> ...]
    ```
-   - Höchstens 5 Seiten pro Lauf (harte Grenze im Code). Jede URL muss mit der `base_url` aus `sites/de.yaml` beginnen.
-   - Vorher prüft das Skript die robots.txt.
-   - Beim ersten Mal loggst du dich im geöffneten Browser von Hand ein und bestätigst mit Enter (Profil in `browser_profile/de/`).
-   - Zwischen zwei Seiten wartet das Skript 10–20 Sekunden.
-3. **Ausgaben**, nur im Datenordner:
-   - `local/samples/<site>/`: gesicherte Seiten. Sie bleiben lokal und werden nie geteilt. In Phase 3 prüfst du damit den Leser offline.
-   - `local/structure/<site>/`: Skelette.
-4. **Skelett prüfen, bevor du es teilst:**
-   - [ ] Keine lesbaren Wörter außer Elementnamen (`div`, `a` …), CSS-Klassen und den Werten von `role` und `type`.
-   - [ ] Keine CSS-Klasse, die wie ein Name, Ort oder Hofname aussieht.
-   - [ ] Texte erscheinen nur als `⟨TEXT:n⟩` oder `⟨NUM:n⟩`, andere Werte nur als `⟨VAL:n⟩` oder `⟨URL⟩`.
-   - [ ] Findest du etwas Lesbares: Skelett nicht teilen und Claude Code nur die Art des Fundes melden (z. B. „Klassenname enthält einen Namen“), damit die Regeln nachgeschärft werden.
-5. **Teilen:** Die geprüfte Skelett-Datei nach `out/structure/` im Repository-Ordner kopieren (von Git ausgeschlossen) und Claude Code darauf verweisen.
+   - URLs in Anführungszeichen setzen, wenn sie `&` enthalten (PowerShell würde sonst abbrechen).
+   - Höchstens 5 URLs pro Lauf (harte Grenze im Code), keine doppelt. Jede URL muss zur Länderseite gehören (`https://` und der Host aus `base_url` in `sites/de.yaml`).
+   - Vor dem ersten Seitenaufruf prüft das Skript alles und dann die robots.txt. Bei einem Fehler startet es nicht (`Not started: …`, Teil E).
+3. **Ablauf:**
+   - Ein Browserfenster öffnet sich mit dem Profil `browser_profile/de/` und zeigt die Startseite. Beim ersten Mal (oder wenn die Sitzung abgelaufen ist) loggst du dich dort von Hand ein. Dann im Terminal Enter drücken.
+   - Das Skript öffnet die URLs nacheinander, mit 10–20 Sekunden Pause dazwischen (mindestens so lange, wie ein Crawl-delay der robots.txt verlangt). Die Zeit fürs Einloggen zählt als Pause.
+   - **Schau dem Fenster zu.** Siehst du ein Captcha, eine Login-Aufforderung oder eine Fehlerseite: **Strg+C** im Terminal. Das Skript endet sauber; bereits gesicherte Seiten bleiben. Diese Fälle erkennt das Skript erst ab Phase 3 selbst.
+   - Das Skript bricht selbst ab bei Status ab 400, bei einer Umleitung auf eine andere Seite (z. B. die Login-Seite) und bei Browserfehlern (`Run stopped …`, Teil E).
+   - Ein Lauf ruft höchstens 6 Seiten auf: die Startseite (nicht gesichert) und bis zu 5 URLs.
+4. **Ausgaben:**
+   - Im Terminal nur Zähler, Dateinamen und Status, z. B. `Page 2 of 3: status 200, saved 20261119-153012-2.html, skeleton 412 lines`. Steht dahinter `network busy`, hat die Seite noch nachgeladen; das Skelett kann unvollständig sein.
+   - Im Datenordner, je Lauf mit Datum und Uhrzeit im Namen (nie überschrieben):
+     - `local/samples/<site>/…-<n>.html`: gesicherte Seiten. Sie bleiben lokal und werden nie geteilt. In Phase 3 prüfst du damit den Leser offline.
+     - `local/samples/<site>/index.csv`: welche Datei zu welcher URL gehört (`file;url;status;saved_at`). Enthält URLs, bleibt deshalb ebenfalls lokal.
+     - `local/structure/<site>/…-<n>.txt`: Skelette.
+5. **Skelett prüfen, bevor du es teilst.** Am Ende jeder Skelett-Datei steht eine Liste aller lesbaren Wörter (`readable tokens`). Prüfe zuerst diese Liste, dann überfliege den Rest:
+   - [ ] Die Tokenliste enthält nur Elementnamen (`div`, `a` …), Attributnamen (`href`, `aria-label` …), CSS-Klassen und Werte von `role` und `type`.
+   - [ ] Keine CSS-Klasse und kein Wert sieht aus wie ein Name, Ort, Hofname oder eine Profil-ID. Längere Zahlen in Klassen sind bereits ersetzt (`host-⟨NUM:5⟩`).
+   - [ ] In der Struktur erscheinen Texte nur als `⟨TEXT:n⟩` oder `⟨NUM:n⟩`, andere Werte nur als `⟨VAL:n⟩` oder `⟨URL⟩`.
+   - [ ] Findest du etwas Lesbares: Skelett nicht teilen und Claude Code nur die Art des Fundes melden (z. B. „Klassenname enthält einen Namen“). Nach dem Nachschärfen der Regeln erzeugst du die Skelette neu, ohne die Seiten erneut aufzurufen:
+     ```powershell
+     python -m src.page_skeleton ..\wwoof-data\local\samples\de ..\wwoof-data\local\structure\de
+     ```
+6. **Teilen:** Die geprüfte Skelett-Datei nach `out/structure/` im Repository-Ordner kopieren (von Git ausgeschlossen) und Claude Code darauf verweisen, mit einer Zeile, welche Art Seite es ist (z. B. „Suchseite Region 1“, „Profil 2“). Die URL nennst du nicht.
+
+**Generalprobe ohne Länderseite** (empfohlen vor dem ersten Lauf): derselbe Ablauf mit sichtbarem Fenster auf der Übungsseite, mit einem Datenordner unter `out/`:
+
+```powershell
+mkdir out\explore_test -Force
+python -m src.explore_site --sites-dir tests\fixtures\practice_sites --site xt --data-dir out\explore_test https://quotes.toscrape.com/page/2/ https://quotes.toscrape.com/js/
+```
+
+Probiere dabei Login-Pause, Enter und einmal Strg+C aus. Die Übungsseite verlangt keinen Login; Enter genügt.
 
 ### A.1 Voraussetzungen
 
@@ -257,8 +278,17 @@ Das Repository `wwoof-planner` enthält keine Hofdaten. `out/` enthält Ausgaben
 | `Configuration error: …: unknown key '…'`, `missing key '…'` oder `duplicate key '…' (line n)` | Tippfehler, fehlender Eintrag oder Eintrag, der nicht in die Datei gehört | Schlüssel korrigieren; die Länderseiten-Datei enthält nur Länderdaten | gilt |
 | `Configuration error: …: … must look like …`, `base_url must be …`, `invalid YAML: … (line n)` | Wert im falschen Format oder YAML-Syntaxfehler | Wert nach dem genannten Muster korrigieren | gilt |
 | `Configuration error: region key … appears in … and …` | Derselbe Regionsschlüssel in zwei Länderseiten-Dateien | einen der Schlüssel umbenennen (die Spalte `region` enthält kein Land) | gilt |
-| `URL n does not belong to site …` | Die URL gehört nicht zum Host aus `base_url` (z. B. `www` zu viel oder zu wenig, `http://`) | URL von der gewählten Länderseite verwenden; ggf. `base_url` prüfen | gilt (robots.txt-Prüfung); Erkundung ab Schritt 2.2 |
-| Zu viele Seiten | Erkundung: mehr als 5 URLs angegeben | auf mehrere Läufe verteilen | noch nicht gebaut (Phase 2) |
+| `URL n does not belong to site …` | Die URL gehört nicht zum Host aus `base_url` (z. B. `www` zu viel oder zu wenig, `http://`) | URL von der gewählten Länderseite verwenden; ggf. `base_url` prüfen | gilt |
+| `Not started: at most 5 pages per run (hard limit); n URLs given` | Erkundung: mehr als 5 URLs angegeben | auf mehrere Läufe verteilen | gilt |
+| `Not started: URL n repeats URL m` | Erkundung: dieselbe URL zweimal angegeben | doppelte URL weglassen | gilt |
+| `Not started: …: data folder not found` oder `… must be outside the repository …` | Erkundung: Datenordner falsch geschrieben oder im Repository | Pfad prüfen, z. B. `..\wwoof-data`; nur Testläufe dürfen `out\` verwenden | gilt |
+| `Not started: site …: the start page is disallowed by robots.txt` oder `URL n of m is disallowed by robots.txt` | Erkundung: robots.txt verbietet eine der Adressen | nicht umgehen; diese URL weglassen, siehe A.7 | gilt |
+| `Run stopped after k of n pages: page i of n: status …` | Die Seite antwortet mit einem Fehler (ab 400), z. B. nicht gefunden oder Zugriff verweigert | Bei 404: URL prüfen. Bei 401, 403, 429 oder 5xx: nicht sofort erneut, siehe A.7 | gilt |
+| `Run stopped after …: redirected to another page (e.g. the login page) …` oder `… to another site …` | Die Seite hat auf eine andere Adresse umgeleitet, meist weil die Sitzung abgelaufen ist | Im Fenster neu einloggen (nächster Lauf zeigt die Startseite); bleibt es dabei, die URL im Browser prüfen | gilt |
+| `Run stopped after …: browser error net::ERR_…` oder `page did not load within 30 seconds` | Keine Verbindung oder Seite zu langsam | Internetverbindung prüfen, später erneut | gilt |
+| `Run stopped: browser profile is in use …` | Ein anderer Lauf mit demselben Profil ist noch offen | anderes Fenster schließen, dann erneut | gilt |
+| `Run stopped by Ctrl+C …` oder `… browser window was closed` | Du hast abgebrochen oder das Browserfenster geschlossen | nichts; gesicherte Seiten bleiben | gilt |
+| `network busy (content may be incomplete)` hinter einer Seite | Die Seite lud nach 10 Sekunden noch Inhalte nach | Skelett prüfen; fehlt Inhalt, die Seite in einem späteren Lauf erneut aufnehmen | gilt |
 | Unbekannte Region | `region` passt zu keinem Regionsschlüssel der Länderseite | Regionsschlüssel aus der Länderseiten-Datei verwenden | noch nicht gebaut (Phase 3) |
 | Region ohne Suchdefinition | Länder-Prüfung noch nicht abgeschlossen | Teil C, Schritte 6 und 7 | noch nicht gebaut (Phase 3) |
 | `DISALLOWED`, Exit-Code 1 | robots.txt verbietet den Abruf | nicht umgehen; siehe A.7 | gilt |
@@ -267,7 +297,7 @@ Das Repository `wwoof-planner` enthält keine Hofdaten. `out/` enthält Ausgaben
 | `robots.txt is an HTML page, not a robots.txt file; check it by hand` | Die Länderseite liefert statt robots.txt eine Webseite | `<base_url>/robots.txt` im Browser ansehen; keinen Lauf starten; Claude Code nur die Art des Fundes melden | gilt |
 | `robots.txt was redirected to another address; check base_url …` | `base_url` stimmt nicht, z. B. mit oder ohne `www` | Adresszeile im Browser prüfen, `base_url` korrigieren, mit `python -m src.config <site_id>` prüfen | gilt |
 | `this Python version evaluates robots.txt rules the old way …` | Ältere Python-Version, die robots.txt-Regeln anders auswertet | Python aktualisieren (getestet mit 3.13.15) | gilt |
-| Login-Aufforderung, Captcha, Zugriffsverweigerung, Status ab 400 | Sitzung abgelaufen oder Schutzmaßnahme der Seite | siehe A.7 | noch nicht gebaut (Phase 2 und 3) |
+| Login-Aufforderung oder Captcha im Seiteninhalt | Sitzung abgelaufen oder Schutzmaßnahme der Seite | Erkundung: Strg+C (A.0); Sammler: siehe A.7 | Erkennung durch das Skript noch nicht gebaut (Phase 3) |
 | Sprachdaten fehlen | Für eine Sprache der Länderseite fehlen Begriffe oder Steckbrief-Regeln | Teil C, Schritt 8 | noch nicht gebaut (Phase 5) |
 
 Die genauen Meldungstexte ergänzen die jeweiligen Phasen.

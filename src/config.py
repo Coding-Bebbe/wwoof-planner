@@ -24,6 +24,8 @@ import yaml
 from src.farm_table import LIST_SEPARATOR
 
 SITES_DIR = Path("sites")
+# The repository folder (src/ is one level below it).
+REPOSITORY_DIR = Path(__file__).resolve().parents[1]
 
 # Keys allowed in a country site file and in each region. All are required.
 SITE_KEYS = ("base_url", "languages", "regions", "learning_categories")
@@ -305,6 +307,29 @@ def site_url_matches(site: Site, url: str) -> bool:
     except ValueError:
         return False
     return parts.scheme == "https" and parts.netloc.lower() == site.host
+
+
+# ---------------------------------------------------------------- data folder
+
+
+def check_data_dir(path: Path) -> Path:
+    """Return the data folder as an absolute path, if it is allowed.
+
+    The folder must exist (a typo must not create a new folder somewhere).
+    Inside the repository only out/ is allowed, for runs with test data:
+    real farm data never belongs into the repository.
+    """
+    resolved = path.resolve()
+    if not resolved.exists():
+        raise ConfigError(f"{path}: data folder not found")
+    if not resolved.is_dir():
+        raise ConfigError(f"{path}: data folder is not a folder")
+    if resolved.is_relative_to(REPOSITORY_DIR) and not resolved.is_relative_to(REPOSITORY_DIR / "out"):
+        raise ConfigError(
+            f"{path}: the data folder must be outside the repository "
+            "(inside it, only out/ is allowed for test runs)"
+        )
+    return resolved
 
 
 # ---------------------------------------------------------------- main

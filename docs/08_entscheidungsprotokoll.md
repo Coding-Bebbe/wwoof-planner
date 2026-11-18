@@ -392,3 +392,40 @@ Seit 15.11.2026 schreibt Claude Code den Code; der Nutzer prüft. Den Test mit E
 | `python -m src.config de` | `sites/de.yaml: ok`, Regionen `voralpenland (VA)`, `sachsen (SN)` (Ausgabe vom Nutzer gezeigt) | – |
 | `python -m src.robots_check de` | robots.txt vorhanden, Startseite erlaubt, kein Crawl-delay (Ausgabe vom Nutzer gezeigt) | Teil C, Schritt 5 für Deutschland erledigt |
 | Erster Versuch im eigenen Fenster | `ModuleNotFoundError: No module named 'yaml'`: Die virtuelle Umgebung war nicht aktiviert, `python` war das allgemeine Python von Windows | `07_bedienung.md`: Aktivieren als fester Schritt in A.1 „Vor jedem Lauf“, A.0/A.3/A.4 verweisen darauf; neue Zeile in Teil E |
+
+### 18.11.2026 – Phase 2, Schritt 2.2: Struktur-Skelett und Erkundungsskript (Claude Code)
+
+**Von Claude Code vorgeschlagen und umgesetzt (Einspruch möglich)**
+
+| Vorschlag | Grund |
+|---|---|
+| Skelett entfernt den ganzen `head`, dazu `link`, `noscript`, `template` (03 nannte `script`, `style`, `svg`, Kommentare, `meta`) | Der Seitentitel nennt oft den Hofnamen; für Selektoren zählt nur der `body` |
+| `svg` bleibt als Element mit Klassen, ohne Inhalt (03: „entfernt“) | Icons, z. B. neben der Gästebuch-Anzahl, helfen beim Entwurf der Selektoren; der Inhalt ist nur Grafik |
+| In CSS-Klassen werden Ziffernfolgen ab 3 Stellen zu `⟨NUM:n⟩`; Klassen mit Nicht-ASCII und ungewöhnliche `role`/`type`-Werte zu `⟨VAL:n⟩` | Profil-IDs (z. B. `host-12345`) gehören zu den Daten, die lokal bleiben (02, Abschnitt 2) |
+| `⟨NUM:n⟩` für Texte nur aus Ziffern und Zeichen von Zahlen und Daten (`.,:;/-()+%`) | Zeigt, wo Anzahlen und Daten stehen (Gästebuch, Kalender) |
+| „Gleichartig“ heißt: gleiche Struktur, Textlängen egal; ab 3 Geschwistern zusammengefasst | Abweichende Karten (z. B. mit zusätzlichem Element) bleiben sichtbar |
+| Grenzen 4000 Zeilen und 100 Ebenen | Ein Test zeigte, dass sehr tief verschachteltes HTML ohne Tiefengrenze Pythons Rekursionsgrenze sprengt |
+| Liste aller lesbaren Wörter am Ende jedes Skeletts; Checkliste in 07, A.0, prüft zuerst diese Liste | Die Prüfung vor dem Teilen wird kürzer und zuverlässiger |
+| `python -m src.page_skeleton <samples> <structure>` erzeugt Skelette aus gesicherten Seiten neu | Nach dem Nachschärfen der Regeln sind keine erneuten Seitenaufrufe nötig |
+| `src/session.py` schon in Phase 2 (in 03 für Phase 3 geplant): persistentes Profil, feste Fenstergröße 1366×900, Warten auf Netzwerkruhe (höchstens 10 s, sonst Hinweis `network busy`), Fehlermeldungen von Playwright ohne URL | Erkundung und Sammler teilen den Browserteil; Selektoren können vom Layout abhängen; Playwright-Meldungen enthalten sonst die URL |
+| Im Fenster-Modus öffnet das Skript zuerst die Startseite und wartet bei jedem Lauf auf Enter; keine automatische Login-Erkennung vor 2.4. Ein Lauf ruft damit höchstens 6 Seiten auf (Startseite nicht gesichert) | Die Selektoren für „eingeloggt“ sind erst nach der Erkundung bekannt |
+| Pause: zufällig 10–20 s seit dem letzten Seitenaufruf, mindestens das Crawl-delay; die Zeit fürs Einloggen zählt mit | Leitplanke 4; Vormerkung zum Crawl-delay erledigt |
+| Abbruch ohne Sichern bei keiner Antwort, Status ab 400, Umleitung auf anderen Host oder anderen Pfad (Abfrage und `/` am Ende zählen nicht), Browserfehler, Strg+C | Leitplanke 8. Eine Umleitung auf einen anderen Pfad ist meist die Login-Seite |
+| Captcha und Login-Aufforderung im Seiteninhalt erkennt das Skript noch nicht; der Nutzer schaut zu und bricht mit Strg+C ab (07, A.0) | Ohne bekannte Selektoren wäre eine Erkennung geraten; Erkennung in Phase 3 (Vormerkung) |
+| Datenordner muss existieren und außerhalb des Repositorys liegen; nur Testläufe dürfen `out/` verwenden (`config.check_data_dir`) | Ein Tippfehler legt keinen neuen Ordner an; echte Daten gelangen nicht ins Repository |
+| Dateinamen `<JJJJMMTT-HHMMSS>-<n>` ohne URL-Teile, nie überschrieben; `index.csv` (lokal) ordnet Datei und URL zu | Zuordnung für die Prüfung in 2.3 und den Offline-Test in Phase 3, ohne URLs in Dateinamen oder Ausgaben |
+| Robots-Prüfung der Startseite getrennt von den URLs | Sonst zählte die Startseite als „URL 1“ und die Nummern passten nicht zum Befehl |
+| Tests ohne Browser: `explore` bekommt Seitenabruf, Uhr, `sleep` und Zufall übergeben; den echten Browser prüft der Lauf auf toscrape | pytest bleibt schnell, ohne Netz und ohne Browser-Installation in GitHub Actions; die Vormerkung „Netzsperre mit Playwright“ entfällt damit |
+| Generalprobe auf toscrape mit sichtbarem Fenster als erster Teil von 2.3 | Der Nutzer übt Login-Pause, Enter und Strg+C, ohne die Länderseite aufzurufen |
+
+**Funde**
+
+| Thema | Ergebnis | Folge |
+|---|---|---|
+| Probelauf quotes.toscrape.com (headless) | Startseite, `/js/` und `/login` gesichert, Status 200, Pausen 11 s und 17 s; `/js/` enthält die 10 per JavaScript erzeugten Zitate; Skelett ohne lesbare Inhalte, Tokenliste kurz; `index.csv` mit einem BOM | Abnahmekriterium „auf toscrape.com getestet“ erfüllt |
+| Abbruch bei 404 (toscrape) | `Run stopped after 1 of 2 pages: page 2 of 2: status 404`, Exit-Code 1, keine URL | – |
+| Persistentes Profil | Ein Cookie mit Ablaufdatum bleibt nach Schließen und Neustart erhalten (ohne Netz geprüft). Der Login von toscrape eignet sich dafür nicht: er nutzt ein Sitzungs-Cookie, das beim Schließen verfällt | Ob die Sitzung von wwoof.de erhalten bleibt, prüft der Nutzer in 2.3 (Teil C, Schritt 6) |
+| Standardwerte in Funktionen | `sleep=time.sleep` als Standardwert wird beim Einlesen der Funktion festgelegt; ein Test, der `time.sleep` ersetzt, wartete deshalb wirklich (46 s statt 3 s) | Standardwerte werden erst beim Aufruf bestimmt |
+| Ausgabe bei Umleitung in eine Datei | Ohne Leeren der Ausgabe erschien die Abbruchmeldung vor den Seitenzeilen | Ausgabe wird vor dem Beenden geleert (`stop`) |
+| Skelett der toscrape-Zitate | Karten mit 1–2 Tags werden nicht zusammengefasst, Karten ab 3 Tags schon; 121 Zeilen für 10 Zitate | Vormerkung für Phase 3, falls echte Skelette zu lang werden |
+| Tests | 260 Tests grün in unter 3 s (lokal, Windows) | – |

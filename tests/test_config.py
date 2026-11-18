@@ -10,7 +10,16 @@ from pathlib import Path
 import pytest
 import yaml
 
-from src.config import ConfigError, Region, load_site, load_sites, main, site_url_matches
+import src.config as config
+from src.config import (
+    ConfigError,
+    Region,
+    check_data_dir,
+    load_site,
+    load_sites,
+    main,
+    site_url_matches,
+)
 
 FIXTURE_SITES = Path(__file__).parent / "fixtures" / "sites"
 
@@ -380,6 +389,55 @@ def test_site_url_matches(url, expected):
     site = load_site("zz", FIXTURE_SITES)
 
     assert site_url_matches(site, url) is expected
+
+
+# ---------------------------------------------------------------- data folder
+
+
+@pytest.fixture
+def fake_repository(tmp_path, monkeypatch):
+    """Let check_data_dir treat a temporary folder as the repository."""
+    repository = tmp_path / "repo"
+    (repository / "out" / "explore_test").mkdir(parents=True)
+    (repository / "src").mkdir()
+    monkeypatch.setattr(config, "REPOSITORY_DIR", repository)
+    return repository
+
+
+def test_data_dir_outside_repository_is_accepted(tmp_path, fake_repository):
+    data_dir = tmp_path / "wwoof-data"
+    data_dir.mkdir()
+
+    assert check_data_dir(data_dir) == data_dir.resolve()
+
+
+def test_data_dir_under_out_is_accepted(fake_repository):
+    data_dir = fake_repository / "out" / "explore_test"
+
+    assert check_data_dir(data_dir) == data_dir.resolve()
+
+
+@pytest.mark.parametrize("inside", [".", "src"])
+def test_data_dir_elsewhere_in_repository_is_rejected(fake_repository, inside):
+    with pytest.raises(ConfigError, match="must be outside the repository"):
+        check_data_dir(fake_repository / inside)
+
+
+def test_missing_data_dir_is_rejected(tmp_path, fake_repository):
+    with pytest.raises(ConfigError, match="data folder not found"):
+        check_data_dir(tmp_path / "wwoof-dta")
+
+
+def test_file_as_data_dir_is_rejected(tmp_path, fake_repository):
+    path = tmp_path / "data.txt"
+    path.write_text("x", encoding="utf-8")
+
+    with pytest.raises(ConfigError, match="is not a folder"):
+        check_data_dir(path)
+
+
+def test_real_repository_dir_is_found():
+    assert (config.REPOSITORY_DIR / "src" / "config.py").is_file()
 
 
 # ---------------------------------------------------------------- command line
