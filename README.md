@@ -9,8 +9,9 @@ Privates Lern- und Planungsprojekt: KI-freie Python-Skripte, die Hofinformatione
 | Ordner | Inhalt |
 |---|---|
 | `src/` | Python-Code |
-| `sites/` | eine Datei pro Länderseite, z. B. `de.yaml` (ab Phase 2) |
-| `tests/fixtures/` | erfundene Testdaten |
+| `sites/` | eine Datei pro Länderseite, z. B. `de.yaml` |
+| `tests/` | pytest-Tests; `tests/fixtures/`: erfundene Testdaten und Länderseiten |
+| `.github/workflows/` | GitHub Actions: Tests nach jedem Push |
 | `out/` | Ausgaben aus Testläufen (nicht in Git) |
 | `docs/` | Projektdokumentation: Plan, Regeln, Fortschritt |
 
@@ -33,8 +34,10 @@ Im Ordner `wwoof-planner` mit aktivierter virtueller Umgebung:
     python -m src.farm_pandas                   # same evaluations with pandas, compared
     python -m src.table_roundtrip prepare       # copy test table for the spreadsheet test
     python -m src.table_roundtrip compare       # compare after saving in Excel
+    python -m pytest                            # run all tests
+    python -m src.config de                     # check the country site file sites/de.yaml
 
-Alle Skripte arbeiten mit den erfundenen Testdaten in `tests/fixtures/`.
+Diese Befehle arbeiten nur mit erfundenen Testdaten aus `tests/` oder prüfen Dateien im Repository, ohne Netz. Skripte, die eine Länderseite aufrufen (z. B. die robots.txt-Prüfung), beschreibt `docs/07_bedienung.md`; sie startest nur du, im eigenen PowerShell-Fenster.
 
 ## Stand
 

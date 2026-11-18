@@ -1,0 +1,10 @@
+# Practice site toscrape.com, not a country site and not used by pytest.
+# Claude Code tests scripts against it before they run on a real country site
+# (xt: reserved by ISO 3166-1 for user purposes). Example:
+#   python -m src.robots_check --sites-dir tests/fixtures/practice_sites xt
+base_url: "https://quotes.toscrape.com"
+languages: ["en"]
+regions:
+  practice:
+    code: "PR"
+learning_categories: []

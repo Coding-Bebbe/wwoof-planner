@@ -1,0 +1,29 @@
+# Runs the tests on GitHub after every push (tab "Actions" of the repository).
+name: tests
+
+on:
+  push:
+  pull_request:
+
+# The workflow only reads the repository.
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest  # Linux: file names are case-sensitive there, unlike on Windows
+    timeout-minutes: 10
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Install packages
+        run: python -m pip install -r requirements.txt
+
+      - name: Run tests
+        run: python -m pytest

@@ -1,6 +1,6 @@
 # Entscheidungsprotokoll
 
-**Stand:** 17.11.2026 · Verlauf aller Entscheidungen und abgeschlossenen Schrittpläne, chronologisch; neue Einträge kommen ans Ende. Diese Datei wird nicht automatisch geladen. Den aktuellen Stand zeigt `06_fortschritt.md`.
+**Stand:** 18.11.2026 · Verlauf aller Entscheidungen und abgeschlossenen Schrittpläne, chronologisch; neue Einträge kommen ans Ende. Diese Datei wird nicht automatisch geladen. Den aktuellen Stand zeigt `06_fortschritt.md`.
 
 **Hinweise zu älteren Einträgen:**
 - Einträge bis zur Neuausrichtung vom 17.11.2026 (letzter Eintrag) verwenden die alte Phasennummerierung. Zuordnung alt → neu: alte Phase 2 → neue Phasen 2 (pytest, GitHub Actions, robots.txt, Länderseiten-Datei) und 3 (`config.yaml`); alte Phase 3 (Übungsseiten) → in Phase 2 integriert; alte Phase 4 → Phase 2; alte Phase 5 → Phase 3; alte Phase 6 → Phase 5 (Teil B, Bereinigung, entfällt); alte Phase 7 → Phasen 4 und 6.
@@ -344,3 +344,42 @@ Seit 15.11.2026 schreibt Claude Code den Code; der Nutzer prüft. Den Test mit E
 | Nachschärfen von Taxonomie und Steckbrief per Stichprobe, nicht durch Lesen aller nicht abgedeckten Sätze | Schwäche d gilt auch hier |
 | Doku: jedes Thema an einer Stelle (Tabelle in `00_projekt_uebersicht.md`); Verlauf aus 06 in diese Datei verschoben (06: 346 → ca. 60 Zeilen); „Arbeitsregeln für Claude“ und Status aus 00 entfernt; Teilen-Tabelle aus 03 nach 02; Kopfzeilen nur noch mit Datum | Schwäche e: 06 wird in jeder Sitzung geladen |
 | Ein lokales Sprachmodell zum Umformulieren der Beschreibungen verworfen | Nicht KI-frei; frei formulierter Text wäre nicht sicher frei von Namen |
+
+### 18.11.2026 – Phase 2, Schritt 2.1: Tests, CI, Länderseiten-Datei, robots.txt-Prüfung (Claude Code)
+
+**Vorgabe des Nutzers**
+
+| Thema | Entscheidung |
+|---|---|
+| `base_url` für Deutschland | `https://wwoof.de`, wie die Adresszeile des Browsers sie zeigt (offene Frage 1 erledigt) |
+
+**Von Claude Code vorgeschlagen und umgesetzt (Einspruch möglich)**
+
+| Vorschlag | Grund |
+|---|---|
+| `base_url` genau `https://` plus Hostname in Kleinbuchstaben, ohne Pfad, Port und `/` am Ende (strenger als „beginnt mit `https://`“); Zugehörigkeit einer URL über den ganzen Host (`site_url_matches`) | Ein Präfixvergleich ließe `https://wwoof.de.example.com/…` und `https://wwoof.de@example.com/…` durch; die robots-URL bekommt kein `//` |
+| Regionsschlüssel `a–z`, `0–9`, `_`, beginnend mit Buchstaben; Regionskürzel zwei oder drei Großbuchstaben; Sprachcodes zwei Kleinbuchstaben | Dateinamen aus Regionsschlüsseln sind unter Windows und Linux sicher; Format der Kürzel war offen („legt Phase 2 fest“) |
+| Alle vier Schlüssel der Länderseiten-Datei sind Pflicht; in Regionen bisher nur `code`, `search` erst mit festem Format (Schritt 2.4) | Kein Schlüssel auf Vorrat; Tippfehler wie `serach` fallen auf |
+| Jeder Aufruf prüft alle Dateien in `sites/` | Regionsschlüssel müssen über alle Länderseiten eindeutig sein; eine Regel statt Sonderfällen. Folge: Eine fehlerhafte Datei blockiert auch andere Länderseiten |
+| robots.txt: eigener Abruf (ein Versuch, Timeout 15 s), Auswertung mit `urllib.robotparser` für `User-agent: *`; 404/410 = keine Regeln (RFC 9309); 401/403/429, sonstige Status, Netzfehler, HTML-Seite, Umleitung auf andere Adresse = Abbruch; Ausgabe ohne URLs | `RobotFileParser.read()` hat keinen Timeout, macht aus 403 und Serverfehlern still „alles verboten“, aus einer HTML-Seite „alles erlaubt“ und folgt Umleitungen still. Leitplanke 8: Abbruch statt Hartnäckigkeit |
+| HTML-Erkennung am Inhalt (beginnt mit `<`), nicht am Content-Type | Weniger Fehlalarme bei falsch ausgelieferten Text-Dateien; eine Webseite beginnt immer mit `<` |
+| Selbsttest `ensure_rfc9309_parser()` bei jeder Auswertung | Eine ältere Python-Version würde still zu viel erlauben (siehe Funde) |
+| Netzsperre in `tests/conftest.py`: jeder Test scheitert bei Namensauflösung oder Verbindung außer zu Loopback, mit `RuntimeError` | Setzt „Tests greifen nicht auf das Netz zu“ technisch durch. `RuntimeError` statt `OSError`, damit die Fehlerbehandlung im Code den Verstoß nicht als Netzfehler schluckt |
+| Ungültige Länderseiten-Dateien schreiben die Tests als erfundenen Text in `tmp_path`; gültige Beispiele in `tests/fixtures/sites/` (`zz`, `xa`) | Entspricht der Absicht von harter Regel 9 (erfunden, nie aus `sites/`), ohne Dutzende Fixture-Dateien |
+| Übungsseite `tests/fixtures/practice_sites/xt.yaml` (`https://quotes.toscrape.com`), nicht von pytest verwendet | Rauchtest des echten Abrufs durch Claude Code; Grundlage für den Test des Erkundungsskripts in 2.2 |
+| Tests für den Phase-1-Code (`tests/test_farm_table.py`) | Einstieg in pytest an bekanntem Code; ersetzt die Prüfskripte aus dem Scratchpad (Phase 1, Schritt 7) teilweise |
+| GitHub Actions nur unter Linux, Python 3.13, `actions/checkout@v7`, `actions/setup-python@v7`, ohne pip-Cache | Linux unterscheidet Groß- und Kleinschreibung, lokale Läufe decken Windows ab. Ob `cache: pip` in v7 unverändert gilt, sagten die Release-Notizen nicht; der Cache ist nur eine Beschleunigung |
+| Kommandozeile `python -m src.config <site_id>` | Prüft eine Länderseiten-Datei ohne Netz (Teil C, Schritt 4). Für `sites/de.yaml` startet sie der Nutzer, weil die Datei weder Testdaten noch erfunden ist (harte Regel 2, wörtlich gelesen) |
+
+**Funde**
+
+| Thema | Ergebnis | Folge |
+|---|---|---|
+| PyYAML 6.0.3 und doppelte Schlüssel | Übernimmt still den letzten Wert (`a: 1` und `a: 2` ergeben `{'a': 2}`); per Test belegt | Eigener Lader `StrictLoader` lehnt doppelte Schlüssel mit Zeilennummer ab; Vormerkung erledigt |
+| PyYAML und Codes | `no`, `NO`, `on`, `yes` ohne Anführungszeichen werden zu `false`/`true`; `n` bleibt Text | Prüfung auf Strings mit Hinweis auf Anführungszeichen |
+| `urllib.robotparser` in Python 3.13.15 | Wertet nach RFC 9309 aus: längste Regel gewinnt, bei Gleichstand Allow; `*` und `$`; Gruppen für `*` werden zusammengeführt; Prozent-Kodierung normalisiert; 5xx beim Abruf = alles verboten. Die Annahme von Claude Code („erste passende Regel, keine Wildcards“) war veraltet | Kein eigener Regelauswerter nötig; der Plan in 03 bleibt. Belegt durch Tests und den Selbsttest |
+| `urllib.robotparser`: `can_fetch(None, …)` | Stürzt mit `AttributeError` ab | Es wird immer `"*"` übergeben |
+| GitHub Actions | Node 20 ist seit 16.09.2026 vom Runner entfernt; aktuell sind checkout 7.0.1 und setup-python 7.1.0 | v7 statt v4 |
+| `requirements.txt` | Beginnt mit einem BOM (aus `Out-File -Encoding utf8`) | pip erkennt den BOM; im ersten Workflow-Lauf zu bestätigen |
+| Rauchtest auf quotes.toscrape.com | Ein Abruf; Antwort 404, also keine robots.txt, keine Regeln; Startseite und zwei Adressen `allowed` | Echter HTTPS-Abruf funktioniert |
+| Tests | 160 Tests grün (lokal, Windows) | – |

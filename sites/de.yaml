@@ -1,0 +1,11 @@
+# Country site Germany. Only country data (docs/03_programmierprojekt.md, section 5.4).
+# Check after every change: python -m src.config de
+# Search definitions and learning categories follow after the country check (phase 2, step 2.4).
+base_url: "https://wwoof.de"
+languages: ["de", "en"]
+regions:
+  voralpenland:
+    code: "VA"
+  sachsen:
+    code: "SN"
+learning_categories: []

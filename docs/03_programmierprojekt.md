@@ -1,6 +1,6 @@
 # Programmierprojekt: Hof-Sammler (Länderseiten der CWP, zuerst Deutschland)
 
-**Stand:** 17.11.2026 · Maßgeblich für den Code: Ziel, Leitplanken, Aufbau, Datenmodell, Phasen. Regeln zu Daten und Teilen: `02_regeln_und_rahmenbedingungen.md`; Verlauf: `08_entscheidungsprotokoll.md`.
+**Stand:** 18.11.2026 · Maßgeblich für den Code: Ziel, Leitplanken, Aufbau, Datenmodell, Phasen. Regeln zu Daten und Teilen: `02_regeln_und_rahmenbedingungen.md`; Verlauf: `08_entscheidungsprotokoll.md`.
 
 ---
 
@@ -44,7 +44,7 @@
 4. **Normales Tempo, kein Massenabruf:** eine Seite nach der anderen, keine parallelen Abrufe, zufällige Pause zwischen zwei Seitenaufrufen (Vorschlag 10–20 Sekunden). Ein Lauf mit 30 Profilen dauert damit grob 6–13 Minuten (Pausen plus Ladezeiten). Jeder zusätzliche Aufruf pro Profil (z. B. für Gästebuch oder Kalender) verlängert den Lauf entsprechend, bei zwei Zusatzaufrufen auf etwa das Dreifache.
 5. **Echter Browser, eigene Sitzung:** Playwright steuert einen echten Browser. Du loggst dich darin einmal je Länderseite **manuell** ein; jede Länderseite hat ein eigenes Browser-Profil. Dein Passwort steht nie im Code. Keine direkten Aufrufe der Plattform-Schnittstelle (api.wwoof.net), kein Umgehen von Schutzmaßnahmen.
 6. **Läufe startest nur du:** Jeden Lauf gegen eine Länderseite startest du selbst in deinem Terminal. Claude startet weder den Sammler noch andere Skripte, die eine Länderseite oder api.wwoof.net aufrufen (Absprache mit WWOOF: kein direktes KI-Browsing).
-7. **robots.txt:** Die robots.txt der gewählten Länderseite wird vor jedem Lauf geprüft. Bei einem Verbot bricht das Skript ab.
+7. **robots.txt:** Die robots.txt der gewählten Länderseite wird vor jedem Lauf geprüft. Bei einem Verbot bricht das Skript ab. Ausgewertet werden die Regeln für alle Programme (`User-agent: *`) nach RFC 9309. Fehlt die Datei (Status 404 oder 410), gelten keine Regeln. Bei Zugriffsverweigerung, anderen Fehlern, einer HTML-Seite statt robots.txt oder einer Umleitung auf eine andere Adresse bricht das Skript ab (`src/robots_check.py`, seit 18.11.2026).
 8. **Abbruch statt Hartnäckigkeit:** Bei Captcha, Zugriffsverweigerung, Login-Aufforderung oder unerwarteten Fehlern beendet sich das Skript sauber, statt es erneut zu versuchen.
 9. **Daten bleiben lokal und getrennt:** Alles, was ein Lauf erzeugt oder liest (Hoftabelle, Notizen, Berichte, gesicherte Seiten und Skelette der Erkundung, Logs, Browser-Profile), liegt im Datenordner `wwoof-data/` außerhalb des Code-Repositorys (Abschnitt 5.1). Claude hat darauf keinen Zugriff. An Claude gehen nur der Export mit den Whitelist-Feldern und von dir geprüfte Struktur-Skelette (Phase 2); beides gibst du selbst weiter.
 10. **Einmalige Erfassung, keine Redundanzen:** Jeder Hof wird nur einmal abgerufen und steht genau einmal in `farms.csv`, mit genau einem Hof-Code. Erneute Abrufe zur Aktualisierung gibt es nicht. Andere Dateien verweisen nur über den Hof-Code auf einen Hof und wiederholen keine Felder aus `farms.csv`.
@@ -205,12 +205,12 @@ Alle Daten liegen als CSV-Dateien vor. Sie lassen sich in Excel oder LibreOffice
 
 Die Spalten der ersten Stufe überprüfen wir nach der Rückmeldung zur Attrappe (Phase 2).
 
-### 5.4 Konfiguration (Entwurf)
+### 5.4 Konfiguration
 
-Zwei Arten von Dateien (Entscheidung vom 17.11.2026; Phase 2 legt das Format fest):
+Zwei Arten von Dateien (Entscheidung vom 17.11.2026):
 
-- **`config.yaml`** wählt die Länderseite (`site`) und die Region (`region`) und enthält Grenzwerte, Pausen, Pfade und Optionen. Das frühere `farm_code_prefix` entfällt; das Präfix des Hof-Codes wird aus site_id und Regionskürzel gebildet (Abschnitt 5.2).
-- **`sites/<site_id>.yaml`**, eine Datei pro Länderseite, z. B. `sites/de.yaml`. Sie enthält **nur Länderdaten**, keine Grenzwerte, Pausen oder Pfade. `config.py` lehnt unbekannte Schlüssel ab.
+- **`config.yaml`** (Entwurf; folgt in Phase 3) wählt die Länderseite (`site`) und die Region (`region`) und enthält Grenzwerte, Pausen, Pfade und Optionen. Das frühere `farm_code_prefix` entfällt; das Präfix des Hof-Codes wird aus site_id und Regionskürzel gebildet (Abschnitt 5.2).
+- **`sites/<site_id>.yaml`** (Format festgelegt am 18.11.2026), eine Datei pro Länderseite, z. B. `sites/de.yaml`. Sie enthält **nur Länderdaten**, keine Grenzwerte, Pausen oder Pfade. `src/config.py` lädt und prüft sie.
 
 ```yaml
 # config.yaml - draft
@@ -227,27 +227,30 @@ availability:
 ```
 
 ```yaml
-# sites/de.yaml - draft; phase 2 fixes the format and explores the site, phase 3 adds search definitions and categories
-base_url: "https://wwoof.de"        # exact form is checked by the user in phase 2
+# sites/de.yaml - phase 2.4 adds search definitions and learning categories
+base_url: "https://wwoof.de"        # https:// plus host name, no path, no slash at the end
 languages: ["de", "en"]             # language codes of the descriptions
 regions:
-  voralpenland:                     # region key: lower case, unique across all sites
-    code: "VA"                      # region code in the farm code, unique within this site
-    # search: defined after the country check (phase 2)
+  voralpenland:                     # region key
+    code: "VA"                      # region code in the farm code
+    # search: added with its format after the country check (phase 2, step 2.4)
   sachsen:
     code: "SN"
-learning_categories: []             # list from the country check (phase 2)
+learning_categories: []             # list from the country check (phase 2, step 2.4)
 ```
 
-**Was `config.py` prüft** (Phase 2):
-- Codes und Schlüssel sind Strings. Ein `no` ohne Anführungszeichen (Norwegen: site_id `"no"`) liest YAML als `false`; das wird mit klarer Meldung abgelehnt. Codes stehen deshalb immer in Anführungszeichen.
-- `site` besteht aus genau zwei Kleinbuchstaben, und `sites/<site>.yaml` existiert (Vorschlag von Claude Code, Einspruch möglich: Unter Windows würde `"DE"` sonst `de.yaml` laden, unter Linux in GitHub Actions nicht).
-- Nur bekannte Schlüssel, in beiden Dateien; doppelte Schlüssel werden abgelehnt (Vorschlag von Claude Code: PyYAML übernimmt nach bisherigem Kenntnisstand stillschweigend den letzten Wert; in Phase 2 per Test zu belegen).
-- Die gewählte Region ist in der Länderseiten-Datei vorhanden.
-- Regionsschlüssel sind klein und über alle Länderseiten eindeutig; dazu liest `config.py` die Regionsschlüssel aller Dateien in `sites/`. Regionskürzel sind innerhalb einer Länderseite eindeutig (Vorschlag von Claude Code).
-- `base_url` beginnt mit `https://`.
+**Was `config.py` prüft** (umgesetzt in Phase 2, Schritt 2.1; Meldungen in `07_bedienung.md`, Teil E):
+- Alle vier Schlüssel der Länderseiten-Datei sind Pflicht, andere werden abgelehnt. In einer Region ist bisher nur `code` erlaubt; `search` kommt mit seinem Format in Schritt 2.4 dazu.
+- Doppelte Schlüssel werden mit Zeilennummer abgelehnt. PyYAML allein übernimmt still den letzten Wert (per Test belegt).
+- Codes und Schlüssel sind Strings. Ein `no` ohne Anführungszeichen (Norwegen: site_id `"no"`) liest YAML als `false`; das wird mit Hinweis auf die Anführungszeichen abgelehnt.
+- site_id: genau zwei Kleinbuchstaben, geprüft vor dem Öffnen einer Datei (unter Windows würde `"DE"` sonst `de.yaml` laden, unter Linux in GitHub Actions nicht). Jede Datei in `sites/` heißt `<site_id>.yaml`.
+- `base_url`: genau `https://` und Hostname in Kleinbuchstaben, ohne Pfad, Port und `/` am Ende. Ob eine Adresse zur Länderseite gehört, prüft `site_url_matches` über den ganzen Hostnamen, nicht über den Textanfang (sonst ginge auch `https://wwoof.de.example.com`).
+- `languages`: nicht leere Liste aus Codes mit zwei Kleinbuchstaben, ohne Doppelung.
+- Regionsschlüssel: `a–z`, `0–9` und `_`, beginnend mit einem Buchstaben, über alle Länderseiten eindeutig. Dazu prüft `config.py` bei jedem Aufruf alle Dateien in `sites/`; eine fehlerhafte Datei blockiert deshalb auch die anderen.
+- Regionskürzel: zwei oder drei Großbuchstaben, innerhalb einer Länderseite eindeutig.
+- Die gewählte Region ist in der Länderseiten-Datei vorhanden (Phase 3, mit `config.yaml`).
 - **Fehlende Suchdefinition ist zulässig:** Eine Region mit Schlüssel und Kürzel, aber ohne Suchdefinition ist gültig. Das ist der Zustand zwischen dem Festlegen der Regionen und der Länder-Prüfung (`07_bedienung.md`, Teil C). Erst der Sammler verlangt eine Suchdefinition (Phase 3).
-- `learning_categories` darf bis zur Länder-Prüfung leer sein; verlangt wird die Liste erst vom Export-Selbsttest (Phase 4) (Vorschlag von Claude Code, Einspruch möglich).
+- `learning_categories` darf bis zur Länder-Prüfung leer sein; Einträge sind eindeutige Texte ohne `|` (Listentrennzeichen der CSV-Dateien). Verlangt wird die Liste erst vom Export-Selbsttest (Phase 4).
 
 ### 5.5 Konventionen
 
@@ -260,7 +263,7 @@ learning_categories: []             # list from the country check (phase 2)
     - Dateien, die nur Skripte schreiben (`farms.csv`, `keyword_report.csv`, Export), in Excel nur ansehen, nie speichern.
     - Bekommt eine Datei, die du bearbeitest, später eine Datumsspalte, liest das Skript sie in beiden Formaten (`JJJJ-MM-TT` und `TT.MM.JJJJ`).
   - Prüfwerkzeug: `python -m src.table_roundtrip prepare` und `compare` (nur mit der erfundenen Testdatei).
-- **Tests:** pytest ab Phase 2, im Ordner `tests/`, nur mit erfundenen Höfen und erfundenen Länderseiten-Dateien unter `tests/fixtures/` (z. B. `base_url: "https://example.org"`), nie mit echten Dateien aus `sites/`. Erfundene Länderseiten bekommen Ländercodes, die ISO 3166-1 für Benutzerzwecke reserviert und nie einem Land zuteilt, z. B. `zz` oder `xa` (Vorschlag von Claude Code). Tests greifen nicht auf das Netz zu; robots.txt-Tests arbeiten mit erfundenem Text. Prüfungen, die zur Laufzeit abbrechen sollen (Grenzwerte, Export-Selbsttest), lösen eigene Fehler (Exceptions) aus statt `assert`, weil Python `assert`-Anweisungen mit der Option `-O` abschaltet.
+- **Tests:** pytest ab Phase 2, im Ordner `tests/`, nur mit erfundenen Höfen und erfundenen Länderseiten-Dateien unter `tests/fixtures/` (z. B. `base_url: "https://example.org"`), nie mit echten Dateien aus `sites/`. Erfundene Länderseiten bekommen Ländercodes, die ISO 3166-1 für Benutzerzwecke reserviert und nie einem Land zuteilt, z. B. `zz` oder `xa` (Vorschlag von Claude Code). Tests greifen nicht auf das Netz zu; robots.txt-Tests arbeiten mit erfundenem Text. Eine Netzsperre in `tests/conftest.py` lässt jeden Netzzugriff eines Tests scheitern. Ungültige Varianten von Länderseiten-Dateien schreiben die Tests als erfundenen Text in einen temporären Ordner (`tmp_path`). Die Übungsseite toscrape.com steht in `tests/fixtures/practice_sites/`; pytest verwendet sie nicht. Prüfungen, die zur Laufzeit abbrechen sollen (Grenzwerte, Export-Selbsttest), lösen eigene Fehler (Exceptions) aus statt `assert`, weil Python `assert`-Anweisungen mit der Option `-O` abschaltet.
 - **Git:** Jede abgeschlossene Aufgabe wird ein Commit. Vor jedem Commit zeigt `git status`, was hineinkommt. Der Datenordner liegt außerhalb des Repositorys und ist zusätzlich per `.gitignore` ausgeschlossen.
 
 ---

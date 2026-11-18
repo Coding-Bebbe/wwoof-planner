@@ -1,6 +1,6 @@
 # Bedienung des Hof-Sammlers
 
-**Stand:** 17.11.2026 · Anleitung für dich. Sie wächst mit den Phasen: Eine Phase ist erst fertig, wenn hier die Bedienung ihrer neuen Teile beschrieben ist. Teile, die es noch nicht gibt, sind mit **„noch nicht gebaut (Phase X)“** gekennzeichnet. Maßgeblich für den Aufbau ist `03_programmierprojekt.md`.
+**Stand:** 18.11.2026 · Anleitung für dich. Sie wächst mit den Phasen: Eine Phase ist erst fertig, wenn hier die Bedienung ihrer neuen Teile beschrieben ist. Teile, die es noch nicht gibt, sind mit **„noch nicht gebaut (Phase X)“** gekennzeichnet. Maßgeblich für den Aufbau ist `03_programmierprojekt.md`.
 
 ---
 
@@ -77,9 +77,39 @@ region: "voralpenland"     # region key from sites/de.yaml
 - `region` ist ein Regionsschlüssel aus dieser Datei.
 - Grenzwerte und Pausen stehen ebenfalls in `config.yaml`. Die harte Grenze von 50 Profilen pro Lauf steht im Code und lässt sich nicht ändern.
 
-### A.3 robots.txt prüfen – noch nicht gebaut (Phase 2)
+### A.3 robots.txt prüfen
 
-Die Prüfung liest `base_url` aus der Länderseiten-Datei und meldet „erlaubt“ oder „verboten“. Den Befehl ergänzt Phase 2. Erkundungsskript (ab Phase 2) und Sammler (ab Phase 3) prüfen die robots.txt vor jedem Lauf selbst.
+Die Prüfung liest `base_url` aus der Länderseiten-Datei, ruft `<base_url>/robots.txt` **einmal** ab und meldet für die Startseite und für jede angegebene Adresse `allowed` oder `DISALLOWED`. Erkundungsskript (ab Phase 2) und Sammler (ab Phase 3) prüfen die robots.txt vor jedem Lauf selbst.
+
+Im eigenen PowerShell-Fenster, weil die Prüfung die Länderseite aufruft:
+
+```powershell
+python -m src.robots_check de
+python -m src.robots_check de <URL> [<URL> ...]
+```
+
+- Jede URL muss zur Länderseite gehören: `https://` und genau der Host aus `base_url`. Sonst bricht die Prüfung vor dem Abruf ab.
+- Die Ausgabe nennt keine URLs, nur `URL 1`, `URL 2` usw. in der Reihenfolge deiner Eingabe.
+- Ausgewertet werden die Regeln für alle Programme (`User-agent: *`) nach RFC 9309.
+- `crawl delay`: Verlangt die robots.txt eine Wartezeit zwischen zwei Seitenaufrufen, steht sie hier. Die Skripte warten dann mindestens so lange (ab Schritt 2.2).
+- Exit-Code 0, wenn alles erlaubt ist; 1 bei einem Verbot oder Fehler.
+
+Beispiel (erfunden):
+
+```
+Site de: robots.txt found
+  start page   allowed
+  URL 1        allowed
+  crawl delay  none
+Result: 0 of 2 addresses disallowed
+```
+
+| Ergebnis | Bedeutung | Was du tust |
+|---|---|---|
+| `robots.txt found`, alles `allowed` | Die Regeln erlauben die Abrufe | weiter |
+| `no robots.txt (status 404 or 410), no rules apply` | Die Länderseite hat keine robots.txt; nach RFC 9309 gelten dann keine Regeln | weiter |
+| `DISALLOWED` | Die Regeln verbieten diese Adresse | nicht abrufen; siehe A.7 |
+| Abbruch mit Meldung | Abruf nicht möglich oder Antwort unbrauchbar | siehe Teil E |
 
 ### A.4 Starten – noch nicht gebaut (Phase 3)
 
@@ -166,12 +196,13 @@ Für jede weitere Länderseite gehst du die Liste selbst in dieser Reihenfolge d
    - Nein → außerhalb des Umfangs, hier aufhören.
    - Deckt die Organisation mehrere Länder ab oder passt kein eindeutiger Ländercode → anhalten und entscheiden.
 2. **Mitgliedschaft** bei der Landesorganisation abschließen. Beim Beitritt die Mitgliedsbedingungen lesen; widersprechen sie dem Vorgehen, anhalten und entscheiden (Vorschlag von Claude Code).
-3. **Länderseiten-Datei anlegen:** `sites/<site_id>.yaml` mit `base_url` (mit `https://`) und `languages`. site_id ist der ISO-Code in Kleinbuchstaben, in YAML immer in Anführungszeichen. Nur in dieser Datei steht die Domain der Länderseite.
+3. **Länderseiten-Datei anlegen:** `sites/<site_id>.yaml` mit `base_url` und `languages`, Vorlage `sites/de.yaml`. site_id ist der ISO-Code in Kleinbuchstaben, in YAML immer in Anführungszeichen. `base_url` ist nur `https://` und der Host, wie ihn die Adresszeile des Browsers zeigt (mit oder ohne `www`), ohne `/` am Ende. Nur in dieser Datei steht die Domain der Länderseite.
 4. **Regionsschlüssel und Regionskürzel festlegen,** noch ohne Suchdefinition:
-   - Schlüssel klein und über alle Länderseiten eindeutig.
-   - Kürzel innerhalb der Länderseite eindeutig.
-   - `config.py` lässt Regionen ohne Suchdefinition zu.
+   - Schlüssel klein (`a–z`, `0–9`, `_`) und über alle Länderseiten eindeutig.
+   - Kürzel zwei oder drei Großbuchstaben, innerhalb der Länderseite eindeutig.
+   - `config.py` lässt Regionen ohne Suchdefinition zu; `learning_categories: []` darf noch leer sein.
    - Gesamtumfang beachten (offener Punkt 11).
+   - **Prüfen** (ohne Netz): `python -m src.config <site_id>` meldet `ok` oder nennt Datei, Feld und Fehler (Teil E).
 5. **robots.txt prüfen** (A.3). Verbietet sie den Abruf, wird die Länderseite nicht erfasst.
 6. **Länder-Prüfung** wie Phase 2 für Deutschland: Vorab-Sichtung von Hand und Erkundungsskript (A.0). Claude Code bekommt nur geprüfte Skelette und Strukturbeschreibungen mit Platzhaltern. Zu klären:
    - Gleicher Seitenaufbau wie die bisherigen Länderseiten? Passen die plattformweiten Selektoren?
@@ -216,14 +247,21 @@ Das Repository `wwoof-planner` enthält keine Hofdaten. `out/` enthält Ausgaben
 | `ModuleNotFoundError: No module named 'src'` | Skript über den ▷-Knopf oder außerhalb des Ordners `wwoof-planner` gestartet | Im Ordner `wwoof-planner` mit `python -m src.<modul>` starten | gilt |
 | Fehlermeldung, die den Modulnamen mit `.py` nennt (z. B. `src.filter_region.py`) | Bei `python -m` wurde `.py` angehängt | Modulname ohne `.py`: `python -m src.filter_region` | gilt |
 | Aktivierung der virtuellen Umgebung blockiert | Ausführungsrichtlinie von PowerShell | `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` (`04_technische_voraussetzungen.md`, Abschnitt 3) | gilt |
-| Ein Code ist kein Text (z. B. `site: no` ohne Anführungszeichen) | YAML liest `no` als `false` | Wert in Anführungszeichen setzen | noch nicht gebaut (Phase 2) |
-| Länderseiten-Datei nicht gefunden | `site` falsch geschrieben, nicht klein oder Datei fehlt | site_id in Kleinbuchstaben; Datei in `sites/` prüfen | noch nicht gebaut (Phase 2) |
-| Unbekannter oder doppelter Schlüssel | Tippfehler oder Eintrag, der nicht in die Datei gehört | Schlüssel korrigieren; die Länderseiten-Datei enthält nur Länderdaten | noch nicht gebaut (Phase 2) |
-| URL passt nicht zur Länderseite | Erkundung: die URL beginnt nicht mit der `base_url` aus der Länderseiten-Datei | URL von der gewählten Länderseite verwenden | noch nicht gebaut (Phase 2) |
+| `Configuration error: … is false, not text; put codes in quotes …` | Ein Code steht ohne Anführungszeichen, z. B. `no`; YAML liest ihn als `false` | Wert in Anführungszeichen setzen | gilt |
+| `Configuration error: site id must look like "de" …` oder `…/<site>.yaml: file not found` | site_id falsch geschrieben, nicht klein oder Datei fehlt | site_id in Kleinbuchstaben; Datei in `sites/` prüfen | gilt |
+| `Configuration error: …: unknown key '…'`, `missing key '…'` oder `duplicate key '…' (line n)` | Tippfehler, fehlender Eintrag oder Eintrag, der nicht in die Datei gehört | Schlüssel korrigieren; die Länderseiten-Datei enthält nur Länderdaten | gilt |
+| `Configuration error: …: … must look like …`, `base_url must be …`, `invalid YAML: … (line n)` | Wert im falschen Format oder YAML-Syntaxfehler | Wert nach dem genannten Muster korrigieren | gilt |
+| `Configuration error: region key … appears in … and …` | Derselbe Regionsschlüssel in zwei Länderseiten-Dateien | einen der Schlüssel umbenennen (die Spalte `region` enthält kein Land) | gilt |
+| `URL n does not belong to site …` | Die URL gehört nicht zum Host aus `base_url` (z. B. `www` zu viel oder zu wenig, `http://`) | URL von der gewählten Länderseite verwenden; ggf. `base_url` prüfen | gilt (robots.txt-Prüfung); Erkundung ab Schritt 2.2 |
 | Zu viele Seiten | Erkundung: mehr als 5 URLs angegeben | auf mehrere Läufe verteilen | noch nicht gebaut (Phase 2) |
 | Unbekannte Region | `region` passt zu keinem Regionsschlüssel der Länderseite | Regionsschlüssel aus der Länderseiten-Datei verwenden | noch nicht gebaut (Phase 3) |
 | Region ohne Suchdefinition | Länder-Prüfung noch nicht abgeschlossen | Teil C, Schritte 6 und 7 | noch nicht gebaut (Phase 3) |
-| robots.txt verbietet den Abruf | Regel der Länderseite | nicht umgehen; siehe A.7 | noch nicht gebaut (Phase 2) |
+| `DISALLOWED`, Exit-Code 1 | robots.txt verbietet den Abruf | nicht umgehen; siehe A.7 | gilt |
+| `robots.txt: access denied or too many requests (status …); do not retry now` | Die Länderseite verweigert den Abruf (401, 403) oder bremst (429) | nicht sofort erneut; später ein Versuch; tritt es wieder auf, anhalten und besprechen (A.7) | gilt |
+| `robots.txt: unexpected status …` oder `robots.txt could not be fetched (…)` | Serverfehler, keine Verbindung, Zeitüberschreitung | Internetverbindung prüfen, später erneut | gilt |
+| `robots.txt is an HTML page, not a robots.txt file; check it by hand` | Die Länderseite liefert statt robots.txt eine Webseite | `<base_url>/robots.txt` im Browser ansehen; keinen Lauf starten; Claude Code nur die Art des Fundes melden | gilt |
+| `robots.txt was redirected to another address; check base_url …` | `base_url` stimmt nicht, z. B. mit oder ohne `www` | Adresszeile im Browser prüfen, `base_url` korrigieren, mit `python -m src.config <site_id>` prüfen | gilt |
+| `this Python version evaluates robots.txt rules the old way …` | Ältere Python-Version, die robots.txt-Regeln anders auswertet | Python aktualisieren (getestet mit 3.13.15) | gilt |
 | Login-Aufforderung, Captcha, Zugriffsverweigerung, Status ab 400 | Sitzung abgelaufen oder Schutzmaßnahme der Seite | siehe A.7 | noch nicht gebaut (Phase 2 und 3) |
 | Sprachdaten fehlen | Für eine Sprache der Länderseite fehlen Begriffe oder Steckbrief-Regeln | Teil C, Schritt 8 | noch nicht gebaut (Phase 5) |
 

@@ -1,0 +1,10 @@
+# Invented country site for tests. zz is reserved by ISO 3166-1 for user purposes
+# and never assigned to a country. Its regions have no search definition yet.
+base_url: "https://example.org"
+languages: ["de", "en"]
+regions:
+  testtal:
+    code: "TT"
+  musterland:
+    code: "ML"
+learning_categories: ["Gemüsebau", "Tierhaltung", "Käseherstellung"]

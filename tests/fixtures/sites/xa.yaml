@@ -1,0 +1,8 @@
+# Invented second country site for tests (xa: reserved by ISO 3166-1 for user purposes).
+# Learning categories stay empty, as before a country check.
+base_url: "https://example.com"
+languages: ["en"]
+regions:
+  probeheide:
+    code: "PH"
+learning_categories: []
