@@ -8,9 +8,8 @@
 
 - Phasen 0 und 1 abgeschlossen (Tag `phase-1`).
 - 17.11.2026: Hof-Sammler für alle Länderseiten der CWP (Commit `Docs: support CWP country sites`). Danach Neuausrichtung: Erkundung der Länderseite vorgezogen, Steckbrief statt Bereinigung und Freigabe, Doku verschlankt (`08_entscheidungsprotokoll.md`, letzter Eintrag).
-- 18.11.2026: Schritt 2.1 erledigt: pytest mit Netzsperre, GitHub Actions, `src/config.py` (Länderseiten-Dateien), `src/robots_check.py`, `sites/de.yaml` (`base_url` `https://wwoof.de`).
-- Länderseiten: Deutschland (`de`) Mitgliedschaft aktiv, Länderseiten-Datei angelegt, Länder-Prüfung in Phase 2; Norwegen nächster Kandidat (`07_bedienung.md`, Teil C); Irland außerhalb des Umfangs.
-- **Beim Nutzer offen (aus 2.1):** `python -m src.config de` (prüft `sites/de.yaml`); nach dem Push den Workflow „tests“ im Reiter „Actions“ prüfen; optional `python -m src.robots_check de` im eigenen Fenster (07, A.3), Ergebnis nur als Status und Zahlen melden.
+- 18.11.2026: Schritt 2.1 erledigt: pytest mit Netzsperre, GitHub Actions (Workflow grün), `src/config.py` (Länderseiten-Dateien), `src/robots_check.py`, `sites/de.yaml` (`base_url` `https://wwoof.de`, vom Nutzer mit `python -m src.config de` geprüft).
+- Länderseiten: Deutschland (`de`) Mitgliedschaft aktiv; Teil C, Schritte 3–5 erledigt (robots.txt vorhanden, Startseite erlaubt, kein Crawl-delay; Prüfung des Nutzers am 18.11.2026); Länder-Prüfung in Phase 2. Norwegen nächster Kandidat (`07_bedienung.md`, Teil C); Irland außerhalb des Umfangs.
 - **Nächster Schritt:** Phase 2, Schritt 2.2.
 
 ---
@@ -33,7 +32,7 @@
 
 | Nr. | Schritt | Wer | Status |
 |---|---|---|---|
-| 2.1 | pytest und GitHub Actions; `robots_check.py` mit Tests an erfundenem robots.txt-Text; `config.load_site()` mit den Prüfungen aus 03, Abschnitt 5.4; `sites/de.yaml` (Regionen nur mit Schlüssel und Kürzel); Tests mit erfundenen Länderseiten (`zz`, `site: no`) | Claude Code | erledigt (18.11.2026); Workflow auf GitHub prüft der Nutzer nach dem Push |
+| 2.1 | pytest und GitHub Actions; `robots_check.py` mit Tests an erfundenem robots.txt-Text; `config.load_site()` mit den Prüfungen aus 03, Abschnitt 5.4; `sites/de.yaml` (Regionen nur mit Schlüssel und Kürzel); Tests mit erfundenen Länderseiten (`zz`, `site: no`) | Claude Code | erledigt (18.11.2026) |
 | 2.2 | `page_skeleton.py` mit Tests an erfundenem HTML; `explore_site.py`; Testlauf auf quotes.toscrape.com; `07_bedienung.md`, Teil A.0 | Claude Code | offen |
 | 2.3 | Vorab-Sichtung von Hand; Lauf auf wwoof.de (Suchseite je Region, 2–3 Profile, ggf. Reiter); Skelette prüfen und teilen | Nutzer | offen |
 | 2.4 | Auswertung: Aufbau in 03 dokumentieren; Selektoren-Entwurf; erfundene Testseiten in `tests/fixtures/pages/`; offene Punkte 10–12 entscheiden | beide | offen |

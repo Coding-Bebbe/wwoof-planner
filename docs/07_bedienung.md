@@ -34,7 +34,7 @@ Zweck: den Aufbau einer Länderseite kennenlernen, bevor der Sammler entsteht (L
    - Gibt es einen Kalender?
    - Werden Lernkategorien angezeigt?
    - Wie sind Profil-URLs aufgebaut (Muster mit Platzhaltern)?
-2. **Skript starten** im eigenen PowerShell-Fenster:
+2. **Skript starten** im eigenen PowerShell-Fenster mit aktivierter Umgebung (A.1):
    ```powershell
    python -m src.explore_site --site de --data-dir ..\wwoof-data <URL> [<URL> ...]
    ```
@@ -62,6 +62,12 @@ Einmal je Länderseite, vor dem ersten Lauf:
 Vor jedem Lauf:
 - Gesamtumfang und Tagesgrenze beachten (offener Punkt 11 in `00_projekt_uebersicht.md`; wird vor Phase 3 festgelegt).
 - Ein eigenes PowerShell-Fenster außerhalb von VS Code verwenden. In VS Code ist keine Datei aus `wwoof-data` geöffnet.
+- Im neuen Fenster in den Repository-Ordner wechseln und die virtuelle Umgebung aktivieren; erst dann findet Python die Pakete (PyYAML, Playwright):
+  ```powershell
+  cd $HOME\Projekte\wwoof-planner
+  .\.venv\Scripts\Activate.ps1
+  ```
+  Aktiv ist sie, wenn die Eingabezeile mit `(.venv)` beginnt. Das Terminal in VS Code aktiviert sie selbst, ein eigenes Fenster nicht.
 
 ### A.2 Länderseite und Region wählen – noch nicht gebaut (Phase 3)
 
@@ -81,7 +87,7 @@ region: "voralpenland"     # region key from sites/de.yaml
 
 Die Prüfung liest `base_url` aus der Länderseiten-Datei, ruft `<base_url>/robots.txt` **einmal** ab und meldet für die Startseite und für jede angegebene Adresse `allowed` oder `DISALLOWED`. Erkundungsskript (ab Phase 2) und Sammler (ab Phase 3) prüfen die robots.txt vor jedem Lauf selbst.
 
-Im eigenen PowerShell-Fenster, weil die Prüfung die Länderseite aufruft:
+Im eigenen PowerShell-Fenster mit aktivierter Umgebung (A.1), weil die Prüfung die Länderseite aufruft:
 
 ```powershell
 python -m src.robots_check de
@@ -113,11 +119,9 @@ Result: 0 of 2 addresses disallowed
 
 ### A.4 Starten – noch nicht gebaut (Phase 3)
 
-Im eigenen PowerShell-Fenster:
+Im eigenen PowerShell-Fenster mit aktivierter Umgebung (A.1):
 
 ```powershell
-cd $HOME\Projekte\wwoof-planner
-.\.venv\Scripts\Activate.ps1
 python -m src.collector
 ```
 
@@ -245,6 +249,7 @@ Das Repository `wwoof-planner` enthält keine Hofdaten. `out/` enthält Ausgaben
 | Meldung | Ursache | Was tun | Stand |
 |---|---|---|---|
 | `ModuleNotFoundError: No module named 'src'` | Skript über den ▷-Knopf oder außerhalb des Ordners `wwoof-planner` gestartet | Im Ordner `wwoof-planner` mit `python -m src.<modul>` starten | gilt |
+| `ModuleNotFoundError: No module named 'yaml'` (oder `playwright`, `pandas`) | Virtuelle Umgebung im eigenen Fenster nicht aktiviert; das allgemeine Python von Windows hat die Pakete nicht | Umgebung aktivieren (A.1), dann den Befehl wiederholen | gilt |
 | Fehlermeldung, die den Modulnamen mit `.py` nennt (z. B. `src.filter_region.py`) | Bei `python -m` wurde `.py` angehängt | Modulname ohne `.py`: `python -m src.filter_region` | gilt |
 | Aktivierung der virtuellen Umgebung blockiert | Ausführungsrichtlinie von PowerShell | `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` (`04_technische_voraussetzungen.md`, Abschnitt 3) | gilt |
 | `Configuration error: … is false, not text; put codes in quotes …` | Ein Code steht ohne Anführungszeichen, z. B. `no`; YAML liest ihn als `false` | Wert in Anführungszeichen setzen | gilt |

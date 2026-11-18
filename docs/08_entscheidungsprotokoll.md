@@ -383,3 +383,12 @@ Seit 15.11.2026 schreibt Claude Code den Code; der Nutzer prüft. Den Test mit E
 | `requirements.txt` | Beginnt mit einem BOM (aus `Out-File -Encoding utf8`) | pip erkennt den BOM; im ersten Workflow-Lauf zu bestätigen |
 | Rauchtest auf quotes.toscrape.com | Ein Abruf; Antwort 404, also keine robots.txt, keine Regeln; Startseite und zwei Adressen `allowed` | Echter HTTPS-Abruf funktioniert |
 | Tests | 160 Tests grün (lokal, Windows) | – |
+
+### 18.11.2026 – Nachtrag zu Schritt 2.1: Prüfungen des Nutzers
+
+| Thema | Ergebnis | Folge |
+|---|---|---|
+| Workflow „tests“ auf GitHub | Nach dem Push grün (laut Nutzer) | Abnahmekriterium von 2.1 erfüllt; der BOM in `requirements.txt` stört pip nicht |
+| `python -m src.config de` | `sites/de.yaml: ok`, Regionen `voralpenland (VA)`, `sachsen (SN)` (Ausgabe vom Nutzer gezeigt) | – |
+| `python -m src.robots_check de` | robots.txt vorhanden, Startseite erlaubt, kein Crawl-delay (Ausgabe vom Nutzer gezeigt) | Teil C, Schritt 5 für Deutschland erledigt |
+| Erster Versuch im eigenen Fenster | `ModuleNotFoundError: No module named 'yaml'`: Die virtuelle Umgebung war nicht aktiviert, `python` war das allgemeine Python von Windows | `07_bedienung.md`: Aktivieren als fester Schritt in A.1 „Vor jedem Lauf“, A.0/A.3/A.4 verweisen darauf; neue Zeile in Teil E |
